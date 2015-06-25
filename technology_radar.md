@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-This document is to write down some notes for various technologies for futrue reference.
+This document is to write down some notes about various technologies for reference.
 
 ## 2. Programming Language and Framework
 
