@@ -208,9 +208,11 @@ Seeing the Solr is a document-based NoSQL datastore. The following dimensions sh
 #### Indexing
 The basic unit of information in Solr is a **document** which is composed of **fields**. For example, a document about a person might contains fields like name, biography, favorite color, and so on. A field has properties, like type, should it be indexed, should it be stored, and so on.  **Field type** tell Solr how to interpret the field and how it can be queried.
 
+![Lucene Indexing Components](https://github.com/rkq/docs/blob/master/pics/lucene-indexing-components.png)
+
 The **schema.xml** defines the fields and field types for your documents.
 
-Schema desing:
+Schema design:
 
 * What is a document in your index?* How is each document uniquely identified?* What fields in your documents can be searched by users?* Which fields should be displayed to users in the search results?
 
@@ -313,4 +315,8 @@ The solr use a global java system property **solr.solr.home** to identify the ro
 The **solrconfig.xml** defines the main settings for a specific Solr **core**, thus, each core has a solrconfig.xml file.
 
 The file **core.properties** is used to autodsicover cores. Once a core is discovered, Solr locates the solrconfig.xml file under directory which contains core.properties file. Solr uses the solrconfig.xml file to initialize the core.
+
+#### Reference
+
+* <http://lucidworks.com>
 
