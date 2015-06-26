@@ -203,12 +203,16 @@ Seeing the Solr is a document-based NoSQL datastore. The following dimensions sh
 7. failure handling & load balance  
 8. scalability  
 9. compression  
-10. atomic read-modify-write 
+10. atomic read-modify-write
+
+#### Lucene
+
+![Lucene Indexing Components](https://github.com/rkq/docs/blob/master/pics/lucene-indexing-components.png)
 
 #### Indexing
 The basic unit of information in Solr is a **document** which is composed of **fields**. For example, a document about a person might contains fields like name, biography, favorite color, and so on. A field has properties, like type, should it be indexed, should it be stored, and so on.  **Field type** tell Solr how to interpret the field and how it can be queried.
 
-![Lucene Indexing Components](https://github.com/rkq/docs/blob/master/pics/lucene-indexing-components.png)
+
 
 The **schema.xml** defines the fields and field types for your documents.
 
