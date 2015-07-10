@@ -1,6 +1,6 @@
 # Search Engines
 
-## Introduction
+## 1. Introduction
 
 ### Information Retrieval
 
@@ -18,5 +18,6 @@ Gerard Salton, a pioneer in information retrieval and one of the leading figures
 Practical issues that impact search engine design also occur for specific appli- cations. The best example of this is *spam* in web search.
 
 Major issues in information retrieval and search engines:![Information Retrieval & Search Engine Major Issues](https://github.com/rkq/docs/blob/master/pics/ir-se-major-issues.png)
-## Architecture of a Search Engine
-
+## 2. Architecture of a Search Engine
+Search engine components support two major functions, which we call *the indexing process* and *the query process*. The major building blocks of indexing process are *text acquisition, text transformation, and index creation*; the major building blocks of query process are *user interaction, ranking, and evaluation*.
+## 3. Crawls and Feeds
