@@ -17,4 +17,6 @@ Gerard Salton, a pioneer in information retrieval and one of the leading figures
 Search engines are used in many applications and for many tasks. To do this, they have to be *customizable or adaptable*. This means that many different aspects of the search engine, such as the ranking algorithm, the interface, or the indexing strategy, must be able to be tuned and adapted to the requirements of the application.
 Practical issues that impact search engine design also occur for specific appli- cations. The best example of this is *spam* in web search.
 
-Major issues in information retrieval and search engines:![Information Retrieval & Search Engine Big Issues](https://github.com/rkq/docs/blob/master/pics/ir-se-big-issues.png)
+Major issues in information retrieval and search engines:![Information Retrieval & Search Engine Major Issues](https://github.com/rkq/docs/blob/master/pics/ir-se-major-issues.png)
+## Architecture of a Search Engine
+
