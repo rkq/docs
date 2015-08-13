@@ -6,13 +6,17 @@
 * Spring <http://spring.io>
 * Netty <http://netty.io>
 
-
 ## Libraries
 
 ### Generic
 
 * Java Platform API <http://docs.oracle.com/javase/8/docs/api/>
 * Google Guava <http://code.google.com/p/guava-libraries/>
+* Apache Commons <http://commons.apache.org>
+
+### Command Line Parsing
+
+* Jewel CLI <http://jewelcli.lexicalscope.com>
 
 ### Logging
 
@@ -28,7 +32,7 @@
 ## Tools
 
 * Maven: a project management and comprehension tool <http://maven.apache.org>
-
+* Maven Repository <http://mvnrepository.com>
 
 ## Middlewares
 
