@@ -1,8 +1,16 @@
 # Java Platform
 
+The Java platform consists of three parts:
+
+1. Java programming language;
+2. Java API, frameworks, libraries, middlewares and toolset;
+3. Java virtual machine.
+
 ## 1. Language Feature
 
-### 1.1 Exception Handling
+### Class Object
+
+### Exception Handling
 
 ##### Types of Exceptions
 
@@ -36,29 +44,31 @@ catch (NoSuchMethodException e) {
 
 #### Best Practice
 
-### 1.2 Generics
+### Generics
+
+### Reflection
 
 ## 2. Frameworks & Libraries
 
-### 2.1 Spring
+### Spring
 
 <http://spring.io>
 
-### 2.2 Netty
+### Netty
 
 <http://netty.io>
 
-### 2.3 Generic APIs
+### Generic APIs
 
 * Java Platform API <http://docs.oracle.com/javase/8/docs/api/>
 * Google Guava <http://code.google.com/p/guava-libraries/>
 * Apache Commons <http://commons.apache.org>
 
-### 2.4 Command Line Parsing
+### Command Line Parsing
 
 * Jewel CLI <http://jewelcli.lexicalscope.com>
 
-### 2.5 Logging, Metrics and Eventing
+### Logging, Metrics and Eventing
 
 * Simple Logging Facade for Java (SLF4J) <http://www.slf4j.org>
 * Log4j 1 <http://logging.apache.org/log4j/1.2/>
@@ -70,7 +80,7 @@ catch (NoSuchMethodException e) {
 
 * Dropwizard has out-of-the-box support for sophisticated configuration, application metrics, logging, operational tools, and much more, allowing you and your team to ship a production-quality web service in the shortest time possible. <http://www.dropwizard.io>
 
-### 2.6 Unit Testing & Mocking
+### Unit Testing & Mocking
 
 * JUnit <http://junit.org>
 * TestNG <http://testng.org>
@@ -78,12 +88,12 @@ catch (NoSuchMethodException e) {
 * EasyMock <http://easymock.org>
 * Mockito <http://mockito.org>
 
-### 2.7 JSON
+### JSON
 
 * Jackson <http://wiki.fasterxml.com/JacksonHome>
 * json-schema <http://json-schema.org>
 
-### 2.8 Http Clients
+### Http Clients
 
 * HttpComponents <http://hc.apache.org>
 * Google Http Client <https://github.com/google/google-http-java-client>
@@ -91,32 +101,36 @@ catch (NoSuchMethodException e) {
 
 
 ## 3. Java Virtual Machine
-### 3.1 Memory Management
+### Garbage Collector
+
+### JIT Compiler
+
+### VM Runtime
 
 ## 4. Middlewares
 
-### 4.1 Tomcat
+### Tomcat
 
 <http://tomcat.apache.org>
 
-### 4.2 Jetty
+### Jetty
 
 <http://www.eclipse.org/jetty/>
 
 ## 5. Toolset
-### 5.1 Continuous Delivery
-#### 5.1.1 Maven
+### Continuous Delivery
+#### Maven
 
 <http://maven.apache.org>
 
 <http://mvnrepository.com>
 
-#### 5.1.2 Jenkins
+#### Jenkins
 
 <http://jenkins-ci.org>
 
-#### 5.1.3 TeamCity
+#### TeamCity
 
 <https://www.jetbrains.com/teamcity/>
 
-### 5.2 JDK Tools
+### JDK Tools
