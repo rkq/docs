@@ -48,7 +48,7 @@ catch (NoSuchMethodException e) {
 
 ### Reflection
 
-## 2. Frameworks & Libraries
+## 2. APIs, Frameworks and Libraries
 
 ### Spring
 
@@ -100,14 +100,7 @@ catch (NoSuchMethodException e) {
 * OkHttp <http://square.github.io/okhttp/>
 
 
-## 3. Java Virtual Machine
-### Garbage Collector
-
-### JIT Compiler
-
-### VM Runtime
-
-## 4. Middlewares
+## 3. Middlewares
 
 ### Tomcat
 
@@ -117,7 +110,7 @@ catch (NoSuchMethodException e) {
 
 <http://www.eclipse.org/jetty/>
 
-## 5. Toolset
+## 4. Toolset
 ### Continuous Delivery
 #### Maven
 
@@ -134,3 +127,11 @@ catch (NoSuchMethodException e) {
 <https://www.jetbrains.com/teamcity/>
 
 ### JDK Tools
+
+## 5. Java Virtual Machine
+### Garbage Collector
+
+### JIT Compiler
+
+### VM Runtime
+
