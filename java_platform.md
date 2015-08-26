@@ -41,7 +41,13 @@ catch (NoSuchMethodException e) {
 ## 2. Frameworks & Libraries
 
 ### 2.1 Spring
+
+<http://spring.io>
+
 ### 2.2 Netty
+
+<http://netty.io>
+
 ### 2.3 Generic APIs
 
 * Java Platform API <http://docs.oracle.com/javase/8/docs/api/>
@@ -88,11 +94,29 @@ catch (NoSuchMethodException e) {
 ### 3.1 Memory Management
 
 ## 4. Middlewares
+
 ### 4.1 Tomcat
+
+<http://tomcat.apache.org>
+
 ### 4.2 Jetty
+
+<http://www.eclipse.org/jetty/>
 
 ## 5. Toolset
 ### 5.1 Continuous Delivery
 #### 5.1.1 Maven
+
+<http://maven.apache.org>
+
+<http://mvnrepository.com>
+
 #### 5.1.2 Jenkins
+
+<http://jenkins-ci.org>
+
+#### 5.1.3 TeamCity
+
+<https://www.jetbrains.com/teamcity/>
+
 ### 5.2 JDK Tools
