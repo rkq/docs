@@ -8,7 +8,51 @@ The Java platform consists of three parts:
 
 ## 1. Language Feature
 
-### Class Object
+<https://docs.oracle.com/javase/tutorial/>
+
+### Enssential Classes to Understand Java
+
+#### Class java.lang.Object
+
+Class Object is the root of the class hierarchy. Every class has Object as a superclass. All objects, including arrays, implement the methods of this class.
+
+<http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html>
+
+#### Class java.lang.Class<T>
+
+Instances of the class Class represent classes and interfaces in a running Java application. An enum is a kind of class and an annotation is a kind of interface. Every array also belongs to a class that is reflected as a Class object that is shared by all arrays with the same element type and number of dimensions. The primitive Java types (boolean, byte, char, short, int, long, float, and double), and the keyword void are also represented as Class objects.
+
+<http://docs.oracle.com/javase/8/docs/api/java/lang/Class.html>
+
+#### Class java.lang.ClassLoader
+
+A class loader is an object that is responsible for loading classes. The class ClassLoader is an abstract class. Given the binary name of a class, a class loader should attempt to locate or generate data that constitutes a definition for the class. A typical strategy is to transform the name into a file name and then read a "class file" of that name from a file system.
+
+<http://docs.oracle.com/javase/8/docs/api/java/lang/ClassLoader.html>
+
+### Annotations
+
+<https://docs.oracle.com/javase/tutorial/java/annotations/index.html>
+
+Annotations, a form of metadata, provide data about a program that is not part of the program itself. Annotations have no direct effect on the operation of the code they annotate.
+
+Annotations have a number of uses, among them:
+
+* Information for the compiler — Annotations can be used by the compiler to detect errors or suppress warnings.
+* Compile-time and deployment-time processing — Software tools can process annotation information to generate code, XML files, and so forth.
+* Runtime processing — Some annotations are available to be examined at runtime.
+
+Annotations can be applied to declarations: declarations of classes, fields, methods, and other program elements. When used on a declaration, each annotation often appears, by convention, on its own line. As of the Java SE 8 release, annotations can also be applied to the use of types.
+
+
+**Predefined Annotation Types**
+
+<https://docs.oracle.com/javase/tutorial/java/annotations/predefined.html>
+
+### Reflection
+
+
+### Generics
 
 ### Exception Handling
 
@@ -61,15 +105,19 @@ API designers often forget that exceptions are full-fledged objects on which arb
 **Avoid unnecessary use of checked exceptions**
 
 Checked exceptions are a wonderful feature of the Java programming language. Unlike return codes, they force the programmer to deal with exceptional conditions, greatly enhancing reliability. That said, overuse of checked exceptions can make an API far less pleasant to use. If a method throws one or more checked exceptions, the code that invokes the method must handle the exceptions in one or more catch blocks, or it must declare that it throws the exceptions and let them propagate out- ward. Either way, it places a nontrivial burden on the programmer.
-The burden is justified if the exceptional condition cannot be prevented by proper use of the API and the programmer using the API can take some useful action once confronted with the exception. Unless both of these conditions hold, an unchecked exception is more appropriate. As a litmus test, ask yourself how the programmer will handle the exception. Is this the best that can be done? If the programmer using the API can do no better, an unchecked exception would be more appropriate.
+The burden is justified if the exceptional condition cannot be prevented by proper use of the API and the programmer using the API can take some useful action once confronted with the exception. Unless both of these conditions hold, an unchecked exception is more appropriate. As a litmus test, ask yourself how the programmer will handle the exception. Is this the best that can be done? If the programmer using the API can do no better, an unchecked exception would be more appropriate.One technique for turning a checked exception into an unchecked exception is to break the method that throws the exception into two methods, the first of which returns a boolean that indicates whether the exception would be thrown.
+**Favor the use of standard exceptions**
+Reusing preexisting exceptions has several benefits. Chief among these, it makes your API easier to learn and use because it matches established conven- tions with which programmers are already familiar. A close second is that pro- grams using your API are easier to read because they aren’t cluttered with unfamiliar exceptions. Last (and least), fewer exception classes mean a smaller memory footprint and less time spent loading classes.**Throw exceptions appropriate to the abstraction**
+Higher layers should catch lower-level exceptions and, in their place, throw exceptions that can be explained in terms of the higher-level abstraction. This idiom is known as exception translation.A special form of exception translation called exception chaining is appropri- ate in cases where the lower-level exception might be helpful to someone debug- ging the problem that caused the higher-level exception. The lower-level exception (the cause) is passed to the higher-level exception, which provides anaccessor method (Throwable.getCause) to retrieve the lower-level exception.
+While exception translation is superior to mindless propagation of excep- tions from lower layers, it should not be overused. Where possible, the best way to deal with exceptions from lower layers is to avoid them, by ensuring that lower-level methods succeed. Sometimes you can do this by checking the validity of the higher-level method’s parameters before passing them on to lower layers.
+If it is impossible to prevent exceptions from lower layers, the next best thing is to have the higher layer silently work around these exceptions, insulating the caller of the higher-level method from lower-level problems. Under these circum- stances, it may be appropriate to log the exception using some appropriate logging facility such as java.util.logging. This allows an administrator to investigate the problem, while insulating the client code and the end user from it.
 
 **Constructor throws exception**
 
 Release acquired resources during the object constructing.
 
-### Generics
 
-### Reflection
+### Nested Classes
 
 ### Common Programming Practice
 
@@ -89,6 +137,10 @@ Here are some guidelines to help you choose between a state-testing method and a
 ### Spring
 
 <http://spring.io>
+
+#### The IoC Container
+
+**Classpath Scanning**
 
 ### Netty
 
@@ -134,6 +186,11 @@ Here are some guidelines to help you choose between a state-testing method and a
 * HttpComponents <http://hc.apache.org>
 * Google Http Client <https://github.com/google/google-http-java-client>
 * OkHttp <http://square.github.io/okhttp/>
+
+
+### Java Servlet Technology
+
+
 
 
 ## 3. Middlewares
