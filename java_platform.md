@@ -30,6 +30,52 @@ A class loader is an object that is responsible for loading classes. The class C
 
 <http://docs.oracle.com/javase/8/docs/api/java/lang/ClassLoader.html>
 
+### Classes & Objects
+
+#### Nested Classes
+
+The Java programming language allows you to define a class within another class. Nested classes are divided into two categories: static and non-static. Nested classes that are declared static are called *static nested classes*. Non-static nested classes are called *inner classes*.
+
+A nested class is a member of its enclosing class. *Non-static nested classes (inner classes) have access to other members of the enclosing class, even if they are declared private. Static nested classes do not have access to other members of the enclosing class.* As a member of the OuterClass, a nested class can be declared private, public, protected, or package private. (Recall that outer classes can only be declared public or package private.)
+
+###### Static Nested Classes
+
+As with class methods and variables, a static nested class is associated with its outer class. And like static class methods, a static nested class cannot refer directly to instance variables or methods defined in its enclosing class: it can use them only through an object reference. 
+
+A static nested class interacts with the instance members of its outer class (and other classes) just like any other top-level class. In effect, a static nested class is behaviorally a top-level class that has been nested in another top-level class for packaging convenience. 
+
+##### Inner Classes
+
+As with instance methods and variables, an inner class is associated with an instance of its enclosing class and has direct access to that object's methods and fields. Also, because an inner class is associated with an instance, it cannot define any static members itself.
+
+Objects that are instances of an inner class exist within an instance of the outer class.
+
+There are two special kinds of inner classes: *local classes* and *anonymous classes*.
+
+**Local classes** are classes that are defined in a block, which is a group of zero or more statements between balanced braces. You typically find local classes defined in the body of a method. A local class has access to the members of its enclosing class. In addition, a local class has access to local variables. However, a local class can only access local variables that are declared final. When a local class accesses a local variable or parameter of the enclosing block, it captures that variable or parameter. Local classes are similar to inner classes because they cannot define or declare any static members.
+
+**Anonymous classes** enable you to make your code more concise. They enable you to declare and instantiate a class at the same time. They are like local classes except that they do not have a name. Use them if you need to use a local class only once. While local classes are class declarations, anonymous classes are expressions, which means that you define the class in another expression.
+
+##### Lambda Expressions
+
+One issue with anonymous classes is that if the implementation of your anonymous class is very simple, such as an interface that contains only one method, then the syntax of anonymous classes may seem unwieldy and unclear. In these cases, you're usually trying to pass functionality as an argument to another method, such as what action should be taken when someone clicks a button. Lambda expressions enable you to do this, to treat functionality as method argument, or code as data.
+
+A lambda expression consists of the following:
+
+* A comma-separated list of formal parameters enclosed in parentheses. 
+* The arrow token, ->
+* A body, which consists of a single expression or a statement block.
+
+Like local and anonymous classes, lambda expressions can capture variables; they have the same access to local variables of the enclosing scope. However, unlike local and anonymous classes, lambda expressions do not have any shadowing issues. Lambda expressions are lexically scoped. This means that they do not inherit any names from a supertype or introduce a new level of scoping. Declarations in a lambda expression are interpreted just as they are in the enclosing environment.
+
+
+**When to Use Nested Classes, Local Classes, Anonymous Classes, and Lambda Expressions **
+
+* Local class: Use it if you need to create more than one instance of a class, access its constructor, or introduce a new, named type (because, for example, you need to invoke additional methods later).
+* Anonymous class: Use it if you need to declare fields or additional methods.
+* Lambda expression: Use it if you are encapsulating a single unit of behavior that you want to pass to other code. For example, you would use a lambda expression if you want a certain action performed on each element of a collection, when a process is completed, or when a process encounters an error. Use it if you need a simple instance of a functional interface and none of the preceding criteria apply (for example, you do not need a constructor, a named type, fields, or additional methods).
+* Nested class: Use it if your requirements are similar to those of a local class, you want to make the type more widely available, and you don't require access to local variables or method parameters. Use a non-static nested class (or inner class) if you require access to an enclosing instance's non-public fields and methods. Use a static nested class if you don't require this access.
+
 ### Annotations
 
 <https://docs.oracle.com/javase/tutorial/java/annotations/index.html>
@@ -119,6 +165,14 @@ Release acquired resources during the object constructing.
 
 ### Nested Classes
 
+### Thread
+
+**What does it mean a thread is interrupted?**
+
+**What will happen when a thread throws an exception and that exception is not catched until by JVM?**
+
+
+
 ### Common Programming Practice
 
 **Secure Coding Guidelines for Java SE**
@@ -131,14 +185,19 @@ A class with a “state-dependent” method that can be invoked only under certa
 
 Here are some guidelines to help you choose between a state-testing method and a distinguished return value. If an object is to be accessed concurrently without external synchronization or is subject to externally induced state transitions, you must use a distinguished return value, as the object’s state could change in the interval between the invocation of a state-testing method and its state-dependent method. Performance concerns may dictate that a distinguished return value be used if a separate state-testing method would duplicate the work of the state- dependent method. All other things being equal, a state-testing method is mildly preferable to a distinguished return value. It offers slightly better readability, and incorrect use may be easier to detect: if you forget to call a state-testing method, the state-dependent method will throw an *unchecked* exception, making the bug obvious; if you forget to check for a distinguished return value, the bug may be subtle.
 
+**Always make a name for created threads, especical for long running threads**
+
 
 ## 2. APIs, Frameworks and Libraries
+
+### Java SE API & Java Servlet API
 
 ### Spring
 
 <http://spring.io>
 
 #### The IoC Container
+In Spring, the objects that form the backbone of your application and that are managed by the Spring IoC container are called *beans*. A bean is an object that is instantiated, assembled, and otherwise managed by a Spring IoC container. Otherwise, a bean is simply one of many objects in your application. Beans, and the dependencies among them, are reflected in the configuration metadata used by a container.The interface org.springframework.context.ApplicationContext represents the Spring *IoC container* and is responsible for instantiating, configuring, and assembling the aforementioned beans. The container gets its instructions on what objects to instantiate, configure, and assemble by reading *configuration metadata*. The configuration metadata is represented in XML, Java annotations, or Java code. It allows you to express the objects that compose your application and the rich interdependencies between such objects.
 
 **Classpath Scanning**
 
