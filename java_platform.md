@@ -308,6 +308,7 @@ The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring
 **When you make your Spring Boot application as an executable jar with an embedded Tomcat 7, the WebApplicationInitialier is NOT called when the application is started. Instead, you need to create a bean which implements the [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring-boot/current/api/org/springframework/boot/context/embedded/ServletContextInitializer.html) interface.** See:
 
 * <https://github.com/spring-projects/spring-boot/issues/522>
+* <https://github.com/spring-projects/spring-boot/issues/321>
 * <http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-embedded-container-servlets-and-filters>
 
 ### Netty
