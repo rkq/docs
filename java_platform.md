@@ -100,6 +100,48 @@ Annotations can be applied to declarations: declarations of classes, fields, met
 
 ### Generics
 
+In a nutshell, generics enable types (classes and interfaces) to be parameters when defining classes, interfaces and methods. Much like the more familiar formal parameters used in method declarations, type parameters provide a way for you to re-use the same code with different inputs. The difference is that the inputs to formal parameters are values, while the inputs to type parameters are types.
+
+Code that uses generics has many benefits over non-generic code:
+
+* Stronger type checks at compile time. A Java compiler applies strong type checking to generic code and issues errors if the code violates type safety. Fixing compile-time errors is easier than fixing runtime errors, which can be difficult to find.
+* Elimination of casts.
+* Enabling programmers to implement generic algorithms. By using generics, programmers can implement generic algorithms that work on collections of different types, can be customized, and are type safe and easier to read.
+
+You can subtype a generic class or interface by extending or implementing it. The relationship between the type parameters of one class or interface and the type parameters of another are determined by the extends and implements clauses.
+
+#### Bounded Type Parameters
+
+There may be times when you want to restrict the types that can be used as type arguments in a parameterized type. For example, a method that operates on numbers might only want to accept instances of Number or its subclasses. This is what bounded type parameters are for.
+
+To declare a bounded type parameter, list the type parameter's name, followed by the extends keyword, followed by its upper bound, which in this example is Number. Note that, in this context, extends is used in a general sense to mean either "extends" (as in classes) or "implements" (as in interfaces).
+
+A type variable with multiple bounds is a subtype of all the types listed in the bound. If one of the bounds is a class, it must be specified first. 
+
+#### Wildcards
+
+In generic code, the question mark (?), called the wildcard, represents an unknown type. The wildcard can be used in a variety of situations: as the type of a parameter, field, or local variable; sometimes as a return type (though it is better programming practice to be more specific). The wildcard is never used as a type argument for a generic method invocation, a generic class instance creation, or a supertype.
+
+**Upper Bounded Wildcards**
+
+You can use an upper bounded wildcard to relax the restrictions on a variable. To declare an upper-bounded wildcard, use the wildcard character ('?'), followed by the extends keyword, followed by its upper bound. Note that, in this context, extends is used in a general sense to mean either "extends" (as in classes) or "implements" (as in interfaces).
+
+**Unbounded Wildcards**
+
+The unbounded wildcard type is specified using the wildcard character (?), for example, List<?>. This is called a list of unknown type. There are two scenarios where an unbounded wildcard is a useful approach:
+
+* If you are writing a method that can be implemented using functionality provided in the Object class.
+* When the code is using methods in the generic class that don't depend on the type parameter. For example, List.size or List.clear. In fact, Class<?> is so often used because most of the methods in Class<T> do not depend on T.
+
+**Lower Bounded Wildcards**
+
+The Upper Bounded Wildcards section shows that an upper bounded wildcard restricts the unknown type to be a specific type or a subtype of that type and is represented using the extends keyword. In a similar way, a lower bounded wildcard restricts the unknown type to be a specific type or a super type of that type.
+
+A lower bounded wildcard is expressed using the wildcard character ('?'), following by the super keyword, followed by its lower bound: <? super A>.
+
+
+
+
 ### Exception Handling
 
 ##### Types of Exceptions
@@ -163,13 +205,17 @@ Checked exceptions are a wonderful feature of the Java programming language. Unl
 Release acquired resources during the object constructing.
 
 
-### Nested Classes
 
-### Thread
+### Concurrency
 
 **What does it mean a thread is interrupted?**
 
 **What will happen when a thread throws an exception and that exception is not catched until by JVM?**
+
+### I/O
+
+
+### Collections
 
 
 
@@ -192,14 +238,77 @@ Here are some guidelines to help you choose between a state-testing method and a
 
 ### Java SE API & Java Servlet API
 
+#### Java Servlet
+
+Key Components Concepts:
+
+* Servlet
+* Servlet Container
+* Request/Response
+* Servlet Context
+* Listener
+* Session
+* Web Application: The servlet container must enforce a one to one correspondence between a Web application and a ServletContext. A ServletContext object provides a servlet with its view of the application.
+
+##### Asynchronous Processing
+
 ### Spring
 
 <http://spring.io>
 
-#### The IoC Container
+##### Convention-based v.s. Annotation-based v.s. Java Configuration v.s. XML Configuration
+
+#### Core Technologies
+
+##### The IoC Container
 In Spring, the objects that form the backbone of your application and that are managed by the Spring IoC container are called *beans*. A bean is an object that is instantiated, assembled, and otherwise managed by a Spring IoC container. Otherwise, a bean is simply one of many objects in your application. Beans, and the dependencies among them, are reflected in the configuration metadata used by a container.The interface org.springframework.context.ApplicationContext represents the Spring *IoC container* and is responsible for instantiating, configuring, and assembling the aforementioned beans. The container gets its instructions on what objects to instantiate, configure, and assemble by reading *configuration metadata*. The configuration metadata is represented in XML, Java annotations, or Java code. It allows you to express the objects that compose your application and the rich interdependencies between such objects.
 
 **Classpath Scanning**
+
+##### AOP
+
+Aspect-Oriented Programming (AOP) complements Object-Oriented Programming (OOP) by providing another way of thinking about program structure. The key unit of modularity in OOP is the *class*, whereas in AOP the unit of modularity is the *aspect*. Aspects enable the modularization of concerns such as transaction management that cut across multiple types and objects. (Such concerns are often termed *cross-cutting concerns* in AOP literature.)
+
+Aspect-oriented programming aims to encapsulate *cross-cutting concerns* into aspects to retain modularity. This allows for the clean isolation and reuse of code addressing the cross-cutting concern.
+
+*In aspect-oriented programming, cross-cutting concerns are aspects of a program that affect other concerns. These concerns often cannot be cleanly decomposed from the rest of the system in both the design and implementation, and can result in either scattering (code duplication), tangling (significant dependencies between systems), or both.*
+
+**Spring AOP is proxy-based.** It is vitally important that you grasp the semantics of what that last statement actually means before you write your own aspects or use any of the Spring AOP-based aspects supplied with the Spring Framework. Spring AOP defaults to using standard *JDK dynamic proxies* for AOP proxies. This enables any interface (or set of interfaces) to be proxied. Spring AOP can also use *CGLIB proxies*. This is necessary to proxy classes rather than interfaces. CGLIB is used by default if a business object does not implement an interface. As it is good practice to program to interfaces rather than classes; business classes normally will implement one or more business interfaces.
+
+*Spring AOP currently supports only method execution join points (advising the execution of methods on Spring beans)*. Field interception is not implemented, although support for field interception could be added without breaking the core Spring AOP APIs. If you need to advise field access and update join points, consider a language such as AspectJ.
+
+###### Interceptors, Filters, and AOP
+
+*HandlerInterceptor* is basically similar to a *Servlet Filter*, but in contrast to the latter it just allows custom pre-processing with the option of prohibiting the execution of the handler itself, and custom post-processing. Filters are more powerful, for example they allow for exchanging the request and response objects that are handed down the chain. Note that a filter is a servlet component, while a interceptor is a Spring component.
+
+As a basic guideline, fine-grained handler-related preprocessing tasks are candidates for HandlerInterceptor implementations, especially factored-out common handler code and authorization checks. On the other hand, a Filter is well-suited for request content and view content handling, like multipart forms and GZIP compression. This typically shows when one needs to map the filter to certain content types (e.g. images), or to all requests.
+
+#### Data Access
+
+#### The Web
+
+The Spring Web model-view-controller (MVC) framework is designed around a DispatcherServlet that dispatches requests to handlers, with configurable handler mappings, view resolution, locale, time zone and theme resolution as well as support for uploading files.
+
+##### DispatcherServlet
+
+##### ServletContainerInitializer & WebApplicationInitializer
+
+Servlet 3.0 [ServletContainerInitializer](http://docs.oracle.com/javaee/7/api/javax/servlet/ServletContainerInitializer.html?is-external=true) designed to support code-based configuration of the servlet container using Spring's WebApplicationInitializer SPI as opposed to (or possibly in combination with) the traditional web.xml-based approach.
+
+*ServletContainerInitializer* Interface which allows a library/runtime to be notified of a web application's startup phase and perform any required programmatic registration of servlets, filters, and listeners in response to it. In Spring, the class [SpringServletContainerInitializer](http://docs.spring.io/autorepo/docs/spring-framework/current/javadoc-api/org/springframework/web/SpringServletContainerInitializer.html#onStartup-java.util.Set-javax.servlet.ServletContext-) implements this interface. In Spring Boot, the class *TomcatStarter* (org.springframework.boot.context.embedded.tomcat.TomcatStarter) also implements this interface.
+
+*WebApplicationInitializer* Interface to be implemented in Servlet 3.0+ environments in order to configure the ServletContext programmatically -- as opposed to (or possibly in conjunction with) the traditional web.xml-based approach. Implementations of this SPI will be detected automatically by *SpringServletContainerInitializer*, which itself is bootstrapped automatically by any Servlet 3.0 container.
+
+Spring's [WebApplicationInitializer](http://docs.spring.io/autorepo/docs/spring-framework/current/javadoc-api/org/springframework/web/WebApplicationInitializer.html) SPI consists of just one method: WebApplicationInitializer.onStartup(ServletContext). The signature is intentionally quite similar to ServletContainerInitializer.onStartup(Set, ServletContext): simply put, SpringServletContainerInitializer is responsible for instantiating and delegating the ServletContext to any user-defined WebApplicationInitializer implementations. It is then the responsibility of each WebApplicationInitializer to do the actual work of initializing the ServletContext. 
+
+**The class SpringServletContainerInitializer is neither designed for extension nor intended to be extended. It should be considered an internal type, with WebApplicationInitializer being the public-facing SPI.**
+
+The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring-boot/current/api/org/springframework/boot/context/embedded/ServletContextInitializer.html) Interface used to configure a Servlet 3.0+ context programmatically. Unlike WebApplicationInitializer, classes that implement this interface (and do not implement WebApplicationInitializer) will not be detected by SpringServletContainerInitializer and hence will not be automatically bootstrapped by the Servlet container. This interface is primarily designed to allow ServletContextInitializers to be managed by Spring and not the Servlet container.
+
+**When you make your Spring Boot application as an executable jar with an embedded Tomcat 7, the WebApplicationInitialier is NOT called when the application is started. Instead, you need to create a bean which implements the [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring-boot/current/api/org/springframework/boot/context/embedded/ServletContextInitializer.html) interface.** See:
+
+* <https://github.com/spring-projects/spring-boot/issues/522>
+* <http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-embedded-container-servlets-and-filters>
 
 ### Netty
 
