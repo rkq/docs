@@ -275,6 +275,58 @@ Configuration metadata could be:
 
 **Classpath Scanning**
 
+###### Environment Abstraction
+The [Environment](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/core/env/Environment.html) is an abstraction integrated in the container that models two key aspects of the application environment: *profiles* and *properties*.A *profile* is a named, logical group of bean definitions to be registered with the container only if the given profile is active. Beans may be assigned to a profile whether defined in XML or via annotations. The role of the Environment object with relation to profiles is in determining which profiles (if any) are currently active, and which profiles (if any) should be active by default.
+*Properties* play an important role in almost all applications, and may originate from a variety of sources: properties files, JVM system properties, system environment variables, JNDI, servlet context parameters, ad-hoc Properties objects, Maps, and so on. The role of the Environment object with relation to properties is to provide the user with a convenient service interface for configuring property sources and resolving properties from them.
+**Bean Definition Profiles**Bean definition profiles is a mechanism in the core container that allows for registration of different beans in different environments. The word environment can mean different things to different users and this feature can help with many use cases, including:
+* working against an in-memory data source ind evelopment v.s. looking up that same data source from JNDI when in QA or production
+* registering monitoring infrastructure only when deploying an application into a performance environment
+* registering customized implementations of beans for customer A v.s.customer B deployments
+
+The @Profile annotation allows you to indicate that a component is eligible for registration when one or more specified profiles are active.
+
+*If a @Configuration class is marked with @Profile, all of the @Bean methods and @Import annotations associated with that class will be bypassed unless one or more of the specified profiles are active.*
+
+Activating a profile can be done in several ways, but the most straightforward is to do it programmatically against the Environment API which is available via an ApplicationContext.
+
+In addition, profiles may also be activated declaratively through the *spring.profiles.active* property which may be specified through system environment variables, JVM system properties, servlet context parameters in web.xml, or even as an entry in JNDI (see the section called “PropertySource abstraction”). In integration tests, active profiles can be declared via the @ActiveProfiles annotation in the spring-test module (see the section called “Context configuration with environment profiles”).
+
+Note that profiles are not an "either-or" proposition; it is possible to activate multiple profiles at once.
+*The default profile represents the profile that is enabled by default. If no profile is active, the dataSource above will be created; this can be seen as a way to provide a default definition for one or more beans. If any profile is enabled, the default profile will not apply.* The name of the default profile can be changed using setDefaultProfiles() on the Environment or declaratively using the spring.profiles.default property.**PropertySource Abstraction**Spring’s Environment abstraction provides search operations over a configurable hierarchy of property sources.
+A PropertySource is a simple abstraction over any source of key-value pairs, and Spring’s StandardEnvironment is configured with two PropertySource objects — one representing the set of JVM system properties (a la System.getProperties()) and one representing the set of system environment variables (a la System.getenv()).
+The Environment object perform sasearch over a set of PropertySource objects. The search performed is hierarchical. By default, system properties have precedence over environment variables.
+Most importantly, the entire mechanism is configurable. Perhaps you have a custom source of properties that you’d like to integrate into this search. No problem — simply implement and instantiate your own PropertySource and add it to the set of PropertySources for the current Environment.
+The @PropertySource annotation provides a convenient and declarative mechanism for adding a PropertySource to Spring’s Environment.
+
+##### Spring Expression Language
+
+The Spring Expression Language (SpEL for short) is a powerful expression language that supports *querying and manipulating an object graph at runtime*. The expression language supports the following functionality:
+
+* Literal expressions
+* Boolean and relational operators
+* Regular expressions
+* Class expressions
+* Accessing properties, arrays, lists, maps
+* Method invocation
+* Relational operators
+* Assignment
+* Calling constructors
+* Bean references
+* Array construction
+* Inlineclists
+* Inline maps
+* Ternary operator
+* Variables
+* User defined functions
+* Collection projection
+* Collection selection
+* Templated expressions
+
+The more common usage of SpEL is to provide an expression string that is evaluated against a specific object instance (called the root object).
+
+**SpEL expressions can be used with XML or annotation-based configuration metadata for defining BeanDefinitions. In both cases the syntax to define the expression is of the form #{\<expression string\>}.**
+The variable systemProperties is predefined, so you can use it in your expressions. Note that you do not have to prefix the predefined variable with the # symbol in this context.
+
 ##### AOP
 
 Aspect-Oriented Programming (AOP) complements Object-Oriented Programming (OOP) by providing another way of thinking about program structure. The key unit of modularity in OOP is the *class*, whereas in AOP the unit of modularity is the *aspect*. Aspects enable the modularization of concerns such as transaction management that cut across multiple types and objects. (Such concerns are often termed *cross-cutting concerns* in AOP literature.)
