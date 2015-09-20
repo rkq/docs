@@ -296,7 +296,7 @@ Note that profiles are not an "either-or" proposition; it is possible to activat
 A PropertySource is a simple abstraction over any source of key-value pairs, and Spring’s StandardEnvironment is configured with two PropertySource objects — one representing the set of JVM system properties (a la System.getProperties()) and one representing the set of system environment variables (a la System.getenv()).
 The Environment object perform sasearch over a set of PropertySource objects. The search performed is hierarchical. By default, system properties have precedence over environment variables.
 Most importantly, the entire mechanism is configurable. Perhaps you have a custom source of properties that you’d like to integrate into this search. No problem — simply implement and instantiate your own PropertySource and add it to the set of PropertySources for the current Environment.
-The @PropertySource annotation provides a convenient and declarative mechanism for adding a PropertySource to Spring’s Environment.
+The @PropertySource annotation provides a convenient and declarative mechanism for adding a PropertySource to Spring’s Environment. Any ${...} placeholders present in a @PropertySource resource location will be resolved against the set of property sources already registered against the environment.
 
 ##### Spring Expression Language
 
