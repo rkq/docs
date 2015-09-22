@@ -336,6 +336,12 @@ For backwards compatibility (historical) reasons however, this changes when the 
 *In practice, if true absolute filesystem paths are needed, it is better to forgo the use of absolute paths with FileSystemResource / FileSystemXmlApplicationContext, and just force the use of a UrlResource, by using the file: URL prefix.*
 
 
+##### Validation, Data Binding, and Type Conversion
+
+There are pros and cons for considering validation as business logic, and Spring offers a design for validation (and data binding) that does not exclude either one of them. Specifically validation should not be tied to the web tier, should be easy to localize and it should be possible to plug in any validator available. Considering the above, Spring has come up with a Validator interface that is both basic and eminently usable in every layer of an application.
+Data binding is useful for allowing user input to be dynamically bound to the domain model of an application (or whatever objects you use to process user input). Spring provides the so-called DataBinder to do exactly that. The Validator and the DataBinder make up the validation package, which is primarily used in but not limited to the MVC framework.
+
+
 ##### Spring Expression Language
 
 The Spring Expression Language (SpEL for short) is a powerful expression language that supports *querying and manipulating an object graph at runtime*. The expression language supports the following functionality:
