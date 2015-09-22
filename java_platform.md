@@ -236,9 +236,11 @@ Here are some guidelines to help you choose between a state-testing method and a
 
 ## 2. APIs, Frameworks and Libraries
 
-### Java SE API & Java Servlet API
+### Java SE API
 
-#### Java Servlet
+Java Platform API <http://docs.oracle.com/javase/8/docs/api/>
+
+### Java Servlet Technology
 
 Key Components Concepts:
 
@@ -297,6 +299,42 @@ Note that profiles are not an "either-or" proposition; it is possible to activat
 The Environment object perform sasearch over a set of PropertySource objects. The search performed is hierarchical. By default, system properties have precedence over environment variables.
 Most importantly, the entire mechanism is configurable. Perhaps you have a custom source of properties that you’d like to integrate into this search. No problem — simply implement and instantiate your own PropertySource and add it to the set of PropertySources for the current Environment.
 The @PropertySource annotation provides a convenient and declarative mechanism for adding a PropertySource to Spring’s Environment. Any ${...} placeholders present in a @PropertySource resource location will be resolved against the set of property sources already registered against the environment.
+##### ResourcesSpring’s *Resource* interface is meant to be a more capable interface for abstracting access to low- level resources. There are a number of Resource implementations that come supplied straight out of the box in Spring:
+* UrlResource
+* ClassPathResource
+* FileSystemResource
+* ServletContextResource
+* InputStreamResource
+* ByteArrayResource
+
+The *ResourceLoader* interface is meant to be implemented by objects that can return (i.e. load) Resource instances. All application contexts implement the ResourceLoader interface, and therefore all application contexts may be used to obtain Resource instances. When you call getResource() on a specific application context, and the location path specified doesn’t have a specific prefix, you will get back a Resource type that is appropriate to that particular application context. You can force specific type of Resource, regardless of the application context type, by specifying special prefix:
+
+|Prefix|Example|Explanation|
+|------|-------|-----------|
+|classpath:|classpath:com/myapp/config.xml|Loaded from the classpath.|
+|file:|file:///data/config.xml|Loaded as a URL, from the filesystem.|
+|http:|http://myserver/log.png|Loaded as a URL.|
+|(none)|/data/config.xml|Depends on the underlying ApplicationContext.|
+
+The *ResourceLoaderAware* interface is a special marker interface, identifying objects that expect to be provided with a ResourceLoader reference. When a class implements ResourceLoaderAware and is deployed into an application context (as a Spring-managed bean), it is recognized as ResourceLoaderAware by the application context. The application context will then invoke the setResourceLoader(ResourceLoader), supplying itself as the argument (remember, all application contexts in Spring implement the ResourceLoader interface). Of course, since an ApplicationContext is a ResourceLoader, the bean could also implement the ApplicationContextAware interface and use the supplied application context directly to load resources, but in general, it’s better to use the specialized ResourceLoader interface if that’s all that’s needed. The code would just be coupled to the resource loading interface, which can be considered a utility interface, and not the whole Spring ApplicationContext interface.
+
+As of Spring 2.5, you can rely upon autowiring of the ResourceLoader as an alternative to implementing the ResourceLoaderAware interface. The "traditional" constructor and byType autowiring modes (as described in the section called “Autowiring collaborators”) are now capable of providing a dependency of type ResourceLoader for either a constructor argument or setter method parameter respectively. For more flexibility (including the ability to autowire fields and multiple parameter methods), consider using the new annotation-based autowiring features. In that case, the ResourceLoader will be autowired into a field, constructor argument, or method parameter that is expecting the ResourceLoader type as long as the field, constructor, or method in question carries the @Autowired annotation.
+
+If the bean itself is going to determine and supply the resource path through some sort of dynamic process, it probably makes sense for the bean to use the ResourceLoader interface to load resources. Consider as an example the loading of a template of some sort, where the specific resource that is needed depends on the role of the user. If the resources are static, it makes sense to eliminate the use of the ResourceLoader interface completely, and just have the bean expose the Resource properties it needs, and expect that they will be injected into it. For example:
+
+```
+@Value("classpath:templates/home.html")
+private Resource template;
+```
+
+**FileSystemResource Caveats**
+
+A FileSystemResource that is not attached to a FileSystemApplicationContext (that is, a FileSystemApplicationContext is not the actual ResourceLoader) will treat absolute vs. relative paths as you would expect. Relative paths are relative to the current working directory, while absolute paths are relative to the root of the filesystem.
+
+For backwards compatibility (historical) reasons however, this changes when the FileSystemApplicationContext is the ResourceLoader. The FileSystemApplicationContext simply forces all attached FileSystemResource instances to treat all location paths as relative, whether they start with a leading slash or not.
+
+*In practice, if true absolute filesystem paths are needed, it is better to forgo the use of absolute paths with FileSystemResource / FileSystemXmlApplicationContext, and just force the use of a UrlResource, by using the file: URL prefix.*
+
 
 ##### Spring Expression Language
 
@@ -402,7 +440,6 @@ The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring
 
 ### Generic APIs
 
-* Java Platform API <http://docs.oracle.com/javase/8/docs/api/>
 * Google Guava <http://code.google.com/p/guava-libraries/>
 * Apache Commons <http://commons.apache.org>
 
@@ -440,10 +477,6 @@ The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring
 * HttpComponents <http://hc.apache.org>
 * Google Http Client <https://github.com/google/google-http-java-client>
 * OkHttp <http://square.github.io/okhttp/>
-
-
-### Java Servlet Technology
-
 
 
 
