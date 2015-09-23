@@ -522,7 +522,7 @@ The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring
 <https://www.jetbrains.com/teamcity/>
 
 
-## 5. Java Virtual Machine
+## 5. Java HotSpot Virtual Machine
 
 ### Java Development Kit
 
