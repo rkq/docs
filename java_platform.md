@@ -521,10 +521,29 @@ The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring
 
 <https://www.jetbrains.com/teamcity/>
 
-### JDK Tools
 
 ## 5. Java Virtual Machine
+
+### Java Development Kit
+
+**JDK 8**
+
+[Java Platform, Standard Edition Tools Reference](http://docs.oracle.com/javase/8/docs/technotes/tools/unix/toc.html)
+
+[JDK Tools and Utilities](http://docs.oracle.com/javase/8/docs/technotes/tools/)
+
+**JDK 7 and Earlier Releases**
+
+[Java HotSpot VM Options](http://www.oracle.com/technetwork/articles/java/vmoptions-jsp-140102.html)
+
+[JDK Tools and Utilities](http://docs.oracle.com/javase/7/docs/technotes/tools/)
+
+
 ### Garbage Collector
+
+[Java SE 6 HotSpot[tm] Virtual Machine Garbage Collection Tuning](http://www.oracle.com/technetwork/java/javase/gc-tuning-6-140523.html)
+
+[Java Platform, Standard Edition HotSpot Virtual Machine Garbage Collection Tuning Guide](http://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/index.html)
 
 ### JIT Compiler
 
