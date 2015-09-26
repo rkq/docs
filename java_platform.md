@@ -534,25 +534,25 @@ With above components and services, the authentication process will look like be
 
 Spring Security’s web infrastructure is based entirely on standard servlet filters. It doesn’t use servlets or any other servlet-based frameworks (such as Spring MVC) internally, so it has no strong links to any particular web technology. It deals in HttpServletRequest s and HttpServletResponse s and doesn’t care whether the requests come from a browser, a web service client, an HttpInvoker or an AJAX application.
 
-Spring Security maintains a filter chain internally where each of the filters has a particular responsibility and filters are added or removed from the configuration depending on which services are required. **The ordering of the filters is important as there are dependencies between them.**
+Spring Security maintains a filter chain internally where each of the filters has a particular responsibility and filters are added or removed from the configuration depending on which services are required. **The ordering of the filters is important as there are dependencies between them.** If you have been using *namespace configuration*, then the filters are automatically configured for you and you don’t have to define any Spring beans explicitly but here may be times when you want full control over the security filter chain, either because you are using features which aren’t supported in the namespace, or you are using your own customized versions of classes.
 
 In Spring Security, the filter classes are also Spring beans defined in the application context and thus able to take advantage of Spring’s rich dependency-injection facilities and lifecycle interfaces. Spring’s **DelegatingFilterProxy** provides the link between web.xml and the application context.
 
 ```
 <filter>
-    <filter-name>filterChainProxy</filter-name>
+    <filter-name>myFilter</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
 </filter>
 
 <filter-mapping>
-    <filter-name>filterChainProxy</filter-name>
+    <filter-name>myFilter</filter-name>
     <url-pattern>/*</url-pattern>
 </filter-mapping>
 ```
 
 Notice that the filter is actually a DelegatingFilterProxy, and not the class that will actually implement the logic of the filter. What DelegatingFilterProxy does is delegate the Filter’s methods through to a bean which is obtained from the Spring application context. This enables the bean to benefit from the Spring web application context lifecycle support and configuration flexibility. The bean must implement javax.servlet.Filter and it must have the same name as that in the filter-name element.
 
-Spring Security’s web infrastructure should only be used by delegating to an instance of FilterChainProxy. The security filters should not be used by themselves. In theory you could declare each Spring Security filter bean that you require in your application context file and add a corresponding DelegatingFilterProxy entry to web.xml for each filter, making sure that they are ordered correctly, but this would be cumbersome and would clutter up the web.xml file quickly if you have a lot of filters. FilterChainProxy lets us add a single entry to web.xml and deal entirely with the application context file for managing our web security beans. It is wired using a DelegatingFilterProxy, just like in the example above, but with the filter-name set to the bean name "filterChainProxy". The filter chain is then declared in the application context with the same bean name. Here’s an example:
+Spring Security’s web infrastructure should only be used by delegating to an instance of **FilterChainProxy**. The security filters should not be used by themselves. In theory you could declare each Spring Security filter bean that you require in your application context file and add a corresponding DelegatingFilterProxy entry to web.xml for each filter, making sure that they are ordered correctly, but this would be cumbersome and would clutter up the web.xml file quickly if you have a lot of filters. FilterChainProxy lets us add a single entry to web.xml and deal entirely with the application context file for managing our web security beans. It is wired using a DelegatingFilterProxy, just like in the example above, but with the filter-name set to the bean name **"filterChainProxy"**. The filter chain is then declared in the application context with the same bean name. Here’s an example:
 
 ```
 <bean id="filterChainProxy" class="org.springframework.security.web.FilterChainProxy">
@@ -573,6 +573,8 @@ Spring Security’s web infrastructure should only be used by delegating to an i
 </bean>
 ```
 
+*Note that FilterChainProxy does not invoke standard filter lifecycle methods on the filters it is configured with. We recommend you use Spring’s application context lifecycle interfaces as an alternative, just as you would for any other Spring bean.*
+
 The order that filters are defined in the chain is very important. Irrespective of which filters you are actually using, the order should be as follows:
 
 * ChannelProcessingFilter, because it might need to redirect to a different protocol
@@ -587,6 +589,9 @@ The order that filters are defined in the chain is very important. Irrespective 
 * FilterSecurityInterceptor, to protect web URIs and raise exceptions when access is denied
 
 
+*If you’re using some other framework that is also filter-based, then you need to make sure that the Spring Security filters come first. This enables the SecurityContextHolder to be populated in time for use by the other filters. Examples are the use of SiteMesh to decorate your web pages or a web framework like Wicket which uses a filter to handle its requests.*
+
+When we looked at how to set up web security using namespace configuration, we used a DelegatingFilterProxy with the name "springSecurityFilterChain". You should now be able to see that this is the name of the FilterChainProxy which is created by the namespace.
 
 
 ## Frameworks - Netty
