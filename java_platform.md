@@ -515,8 +515,8 @@ Core components:
 
 Core services:
 
-* AuthenticationManager and ProviderManager
-* AuthenticationProvider
+* AuthenticationManager, ProviderManager and AuthenticationProvider
+* Password Encoding
 
 The AuthenticationManager is just an interface, so the implementation can be anything we choose. The default implementation in Spring Security is called ProviderManager and rather than handling the authentication request itself, it delegates to a list of configured AuthenticationProvider s, each of which is queried in turn to see if it can perform the authentication. Each provider will either throw an exception or return a fully populated Authentication object. The most common approach to verifying an authentication request is to load the corresponding UserDetails and check the loaded password against the one that has been entered by the user. This is the approach used by the DaoAuthenticationProvider. The loaded UserDetails object - and particularly the GrantedAuthority s it contains - will be used when building the fully populated Authentication object which is returned from a successful authentication and stored in the SecurityContext.
 
