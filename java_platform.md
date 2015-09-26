@@ -6,7 +6,7 @@ The Java platform consists of three parts:
 2. Java API, frameworks, libraries, middlewares and toolset;
 3. Java virtual machine.
 
-## 1. Language Feature
+## Language Feature
 
 <https://docs.oracle.com/javase/tutorial/>
 
@@ -234,11 +234,17 @@ Here are some guidelines to help you choose between a state-testing method and a
 **Always make a name for created threads, especical for long running threads**
 
 
-## 2. APIs, Frameworks and Libraries
+## APIs & Libraries
 
 ### Java SE API
 
 Java Platform API <http://docs.oracle.com/javase/8/docs/api/>
+
+#### Java Collection Framework
+
+#### Concurrency
+
+###### ThreadLocal
 
 ### Java Servlet Technology
 
@@ -253,200 +259,6 @@ Key Components Concepts:
 * Web Application: The servlet container must enforce a one to one correspondence between a Web application and a ServletContext. A ServletContext object provides a servlet with its view of the application.
 
 ##### Asynchronous Processing
-
-### Spring
-
-<http://spring.io>
-
-
-#### Core Technologies
-
-##### The IoC Container
-
-IoC is also known as dependency injection (DI). It is a process whereby objects define their dependencies, that is, the other objects they work with, only through constructor arguments, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean. This process is fundamentally the inverse, hence the name Inversion of Control (IoC), of the bean itself controlling the instantiation or location of its dependencies by using direct construction of classes.
-The org.springframework.beans and org.springframework.context packages are the basis for Spring Framework’s IoC container.
-In Spring, the objects that form the backbone of your application and that are managed by the Spring IoC container are called *beans*. A bean is an object that is instantiated, assembled, and otherwise managed by a Spring IoC container. Otherwise, a bean is simply one of many objects in your application. Beans, and the dependencies among them, are reflected in the configuration metadata used by a container.The interface org.springframework.context.ApplicationContext represents the Spring *IoC container* and is responsible for instantiating, configuring, and assembling the aforementioned beans. The container gets its instructions on what objects to instantiate, configure, and assemble by reading *configuration metadata*. The configuration metadata is represented in *XML, Java annotations, or Java code*. It allows you to express the objects that compose your application and the rich interdependencies between such objects.The following diagram is a high-level view of how Spring works. Your application classes are combined with configuration metadata so that after the ApplicationContext is created and initialized, you have a fully configured and executable system or application.
-![IoC](https://github.com/rkq/docs/blob/master/pics/java_platform_spring_ioc.png)
-
-Configuration metadata could be:
-
-* XML-based configuration
-* Annotation-based configuration
-* Java-based configuration
-* Convention-based configuration
-
-**Classpath Scanning**
-
-###### Environment Abstraction
-The [Environment](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/core/env/Environment.html) is an abstraction integrated in the container that models two key aspects of the application environment: *profiles* and *properties*.A *profile* is a named, logical group of bean definitions to be registered with the container only if the given profile is active. Beans may be assigned to a profile whether defined in XML or via annotations. The role of the Environment object with relation to profiles is in determining which profiles (if any) are currently active, and which profiles (if any) should be active by default.
-*Properties* play an important role in almost all applications, and may originate from a variety of sources: properties files, JVM system properties, system environment variables, JNDI, servlet context parameters, ad-hoc Properties objects, Maps, and so on. The role of the Environment object with relation to properties is to provide the user with a convenient service interface for configuring property sources and resolving properties from them.
-**Bean Definition Profiles**Bean definition profiles is a mechanism in the core container that allows for registration of different beans in different environments. The word environment can mean different things to different users and this feature can help with many use cases, including:
-* working against an in-memory data source ind evelopment v.s. looking up that same data source from JNDI when in QA or production
-* registering monitoring infrastructure only when deploying an application into a performance environment
-* registering customized implementations of beans for customer A v.s.customer B deployments
-
-The @Profile annotation allows you to indicate that a component is eligible for registration when one or more specified profiles are active.
-
-*If a @Configuration class is marked with @Profile, all of the @Bean methods and @Import annotations associated with that class will be bypassed unless one or more of the specified profiles are active.*
-
-Activating a profile can be done in several ways, but the most straightforward is to do it programmatically against the Environment API which is available via an ApplicationContext.
-
-In addition, profiles may also be activated declaratively through the *spring.profiles.active* property which may be specified through system environment variables, JVM system properties, servlet context parameters in web.xml, or even as an entry in JNDI (see the section called “PropertySource abstraction”). In integration tests, active profiles can be declared via the @ActiveProfiles annotation in the spring-test module (see the section called “Context configuration with environment profiles”).
-
-Note that profiles are not an "either-or" proposition; it is possible to activate multiple profiles at once.
-*The default profile represents the profile that is enabled by default. If no profile is active, the dataSource above will be created; this can be seen as a way to provide a default definition for one or more beans. If any profile is enabled, the default profile will not apply.* The name of the default profile can be changed using setDefaultProfiles() on the Environment or declaratively using the spring.profiles.default property.**PropertySource Abstraction**Spring’s Environment abstraction provides search operations over a configurable hierarchy of property sources.
-A PropertySource is a simple abstraction over any source of key-value pairs, and Spring’s StandardEnvironment is configured with two PropertySource objects — one representing the set of JVM system properties (a la System.getProperties()) and one representing the set of system environment variables (a la System.getenv()).
-The Environment object perform sasearch over a set of PropertySource objects. The search performed is hierarchical. By default, system properties have precedence over environment variables.
-Most importantly, the entire mechanism is configurable. Perhaps you have a custom source of properties that you’d like to integrate into this search. No problem — simply implement and instantiate your own PropertySource and add it to the set of PropertySources for the current Environment.
-The @PropertySource annotation provides a convenient and declarative mechanism for adding a PropertySource to Spring’s Environment. Any ${...} placeholders present in a @PropertySource resource location will be resolved against the set of property sources already registered against the environment.
-##### ResourcesSpring’s *Resource* interface is meant to be a more capable interface for abstracting access to low- level resources. There are a number of Resource implementations that come supplied straight out of the box in Spring:
-* UrlResource
-* ClassPathResource
-* FileSystemResource
-* ServletContextResource
-* InputStreamResource
-* ByteArrayResource
-
-The *ResourceLoader* interface is meant to be implemented by objects that can return (i.e. load) Resource instances. All application contexts implement the ResourceLoader interface, and therefore all application contexts may be used to obtain Resource instances. When you call getResource() on a specific application context, and the location path specified doesn’t have a specific prefix, you will get back a Resource type that is appropriate to that particular application context. You can force specific type of Resource, regardless of the application context type, by specifying special prefix:
-
-|Prefix|Example|Explanation|
-|------|-------|-----------|
-|classpath:|classpath:com/myapp/config.xml|Loaded from the classpath.|
-|file:|file:///data/config.xml|Loaded as a URL, from the filesystem.|
-|http:|http://myserver/log.png|Loaded as a URL.|
-|(none)|/data/config.xml|Depends on the underlying ApplicationContext.|
-
-The *ResourceLoaderAware* interface is a special marker interface, identifying objects that expect to be provided with a ResourceLoader reference. When a class implements ResourceLoaderAware and is deployed into an application context (as a Spring-managed bean), it is recognized as ResourceLoaderAware by the application context. The application context will then invoke the setResourceLoader(ResourceLoader), supplying itself as the argument (remember, all application contexts in Spring implement the ResourceLoader interface). Of course, since an ApplicationContext is a ResourceLoader, the bean could also implement the ApplicationContextAware interface and use the supplied application context directly to load resources, but in general, it’s better to use the specialized ResourceLoader interface if that’s all that’s needed. The code would just be coupled to the resource loading interface, which can be considered a utility interface, and not the whole Spring ApplicationContext interface.
-
-As of Spring 2.5, you can rely upon autowiring of the ResourceLoader as an alternative to implementing the ResourceLoaderAware interface. The "traditional" constructor and byType autowiring modes (as described in the section called “Autowiring collaborators”) are now capable of providing a dependency of type ResourceLoader for either a constructor argument or setter method parameter respectively. For more flexibility (including the ability to autowire fields and multiple parameter methods), consider using the new annotation-based autowiring features. In that case, the ResourceLoader will be autowired into a field, constructor argument, or method parameter that is expecting the ResourceLoader type as long as the field, constructor, or method in question carries the @Autowired annotation.
-
-If the bean itself is going to determine and supply the resource path through some sort of dynamic process, it probably makes sense for the bean to use the ResourceLoader interface to load resources. Consider as an example the loading of a template of some sort, where the specific resource that is needed depends on the role of the user. If the resources are static, it makes sense to eliminate the use of the ResourceLoader interface completely, and just have the bean expose the Resource properties it needs, and expect that they will be injected into it. For example:
-
-```
-@Value("classpath:templates/home.html")
-private Resource template;
-```
-
-**FileSystemResource Caveats**
-
-A FileSystemResource that is not attached to a FileSystemApplicationContext (that is, a FileSystemApplicationContext is not the actual ResourceLoader) will treat absolute vs. relative paths as you would expect. Relative paths are relative to the current working directory, while absolute paths are relative to the root of the filesystem.
-
-For backwards compatibility (historical) reasons however, this changes when the FileSystemApplicationContext is the ResourceLoader. The FileSystemApplicationContext simply forces all attached FileSystemResource instances to treat all location paths as relative, whether they start with a leading slash or not.
-
-*In practice, if true absolute filesystem paths are needed, it is better to forgo the use of absolute paths with FileSystemResource / FileSystemXmlApplicationContext, and just force the use of a UrlResource, by using the file: URL prefix.*
-
-
-##### Validation, Data Binding, and Type Conversion
-
-There are pros and cons for considering validation as business logic, and Spring offers a design for validation (and data binding) that does not exclude either one of them. Specifically validation should not be tied to the web tier, should be easy to localize and it should be possible to plug in any validator available. Considering the above, Spring has come up with a Validator interface that is both basic and eminently usable in every layer of an application.
-Data binding is useful for allowing user input to be dynamically bound to the domain model of an application (or whatever objects you use to process user input). Spring provides the so-called DataBinder to do exactly that. The Validator and the DataBinder make up the validation package, which is primarily used in but not limited to the MVC framework.
-
-
-##### Spring Expression Language
-
-The Spring Expression Language (SpEL for short) is a powerful expression language that supports *querying and manipulating an object graph at runtime*. The expression language supports the following functionality:
-
-* Literal expressions
-* Boolean and relational operators
-* Regular expressions
-* Class expressions
-* Accessing properties, arrays, lists, maps
-* Method invocation
-* Relational operators
-* Assignment
-* Calling constructors
-* Bean references
-* Array construction
-* Inlineclists
-* Inline maps
-* Ternary operator
-* Variables
-* User defined functions
-* Collection projection
-* Collection selection
-* Templated expressions
-
-The more common usage of SpEL is to provide an expression string that is evaluated against a specific object instance (called the root object).
-
-**SpEL expressions can be used with XML or annotation-based configuration metadata for defining BeanDefinitions. In both cases the syntax to define the expression is of the form #{\<expression string\>}.**
-The variable systemProperties is predefined, so you can use it in your expressions. Note that you do not have to prefix the predefined variable with the # symbol in this context.
-
-##### AOP
-
-Aspect-Oriented Programming (AOP) complements Object-Oriented Programming (OOP) by providing another way of thinking about program structure. The key unit of modularity in OOP is the *class*, whereas in AOP the unit of modularity is the *aspect*. Aspects enable the modularization of concerns such as transaction management that cut across multiple types and objects. (Such concerns are often termed *cross-cutting concerns* in AOP literature.)
-
-Some central AOP concepts and terminology:
-
-* Aspect: a modularization of a concern that cuts across multiple classes. Transaction management is a good example of a crosscutting concern in enterprise Java applications. In Spring AOP, aspects are implemented using regular classes (the schema-based approach) or regular classes annotated with the @Aspect annotation (the @AspectJ style).
-* Join point: a point during the execution of a program, such as the execution of a method or the handling of an exception. In Spring AOP, a join point always represents a method execution.
-* Advice: action taken by an aspect at a particular join point. Different types of advice include "around," "before" and "after" advice. (Advice types are discussed below.) Many AOP frameworks, including Spring, model an advice as an interceptor, maintaining a chain of interceptors around the join point.
-* Pointcut: a predicate that matches join points. Advice is associated with a pointcut expression and runs at any join point matched by the pointcut (for example, the execution of a method with a certain name). The concept of join points as matched by pointcut expressions is central to AOP, and Spring uses the AspectJ pointcut expression language by default.
-* Introduction: declaring additional methods or fields on behalf of a type. Spring AOP allows you to introduce new interfaces (and a corresponding implementation) to any advised object. For example, you could use an introduction to make a bean implement an IsModified interface, to simplify caching. (An introduction is known as an inter-type declaration in the AspectJ community.)
-* Target object: object being advised by one or more aspects. Also referred to as the advised object. Since Spring AOP is implemented using runtime proxies, this object will always be a proxied object.
-* AOP proxy: an object created by the AOP framework in order to implement the aspect contracts (advise method executions and so on). In the Spring Framework, an AOP proxy will be a JDK dynamic proxy or a CGLIB proxy.
-* Weaving: linking aspects with other application types or objects to create an advised object. This can be done at compile time (using the AspectJ compiler, for example), load time, or at runtime. Spring AOP, like other pure Java AOP frameworks, performs weaving at runtime.
-
-Types of advice:
-
-* Before advice: Advice that executes before a join point, but which does not have the ability to prevent execution flow proceeding to the join point (unless it throws an exception).
-* After returning advice: Advice to be executed after a join point completes normally: for example, if a method returns without throwing an exception.
-* After throwing advice: Advice to be executed if a method exits by throwing an exception.
-* After (finally) advice: Advice to be executed regardless of the means by which a join point exits (normal or exceptional return).
-* Around advice: Advice that surrounds a join point such as a method invocation. This is the most powerful kind of advice. Around advice can perform custom behavior before and after the method invocation. It is also responsible for choosing whether to proceed to the join point or to shortcut the advised method execution by returning its own return value or throwing an exception.
-
-*Around advice is the most general kind of advice. Since Spring AOP, like AspectJ, provides a full range of advice types, we recommend that you use the least powerful advice type that can implement the required behavior.* For example, if you need only to update a cache with the return value of a method, you are better off implementing an after returning advice than an around advice, although an around advice can accomplish the same thing. Using the most specific advice type provides a simpler programming model with less potential for errors. For example, you do not need to invoke the proceed() method on the JoinPoint used for around advice, and hence cannot fail to invoke it.
-
-Aspect-oriented programming aims to encapsulate *cross-cutting concerns* into aspects to retain modularity. This allows for the clean isolation and reuse of code addressing the cross-cutting concern.
-
-*In aspect-oriented programming, cross-cutting concerns are aspects of a program that affect other concerns. These concerns often cannot be cleanly decomposed from the rest of the system in both the design and implementation, and can result in either scattering (code duplication), tangling (significant dependencies between systems), or both.*
-
-**Spring AOP is proxy-based.** It is vitally important that you grasp the semantics of what that last statement actually means before you write your own aspects or use any of the Spring AOP-based aspects supplied with the Spring Framework. Spring AOP defaults to using standard *JDK dynamic proxies* for AOP proxies. This enables any interface (or set of interfaces) to be proxied. Spring AOP can also use *CGLIB proxies*. This is necessary to proxy classes rather than interfaces. CGLIB is used by default if a business object does not implement an interface. As it is good practice to program to interfaces rather than classes; business classes normally will implement one or more business interfaces.
-
-*Spring AOP currently supports only method execution join points (advising the execution of methods on Spring beans)*. Field interception is not implemented, although support for field interception could be added without breaking the core Spring AOP APIs. If you need to advise field access and update join points, consider a language such as AspectJ.
-
-###### Interceptors, Filters, and AOP
-
-*HandlerInterceptor* is basically similar to a *Servlet Filter*, but in contrast to the latter it just allows custom pre-processing with the option of prohibiting the execution of the handler itself, and custom post-processing. Filters are more powerful, for example they allow for exchanging the request and response objects that are handed down the chain. Note that a filter is a servlet component, while a interceptor is a Spring component.
-
-As a basic guideline, fine-grained handler-related preprocessing tasks are candidates for HandlerInterceptor implementations, especially factored-out common handler code and authorization checks. On the other hand, a Filter is well-suited for request content and view content handling, like multipart forms and GZIP compression. This typically shows when one needs to map the filter to certain content types (e.g. images), or to all requests.
-
-#### Data Access
-
-#### The Web
-
-##### Web MVC Framework
-
-The Spring Web model-view-controller (MVC) framework is designed around a DispatcherServlet that dispatches requests to handlers, with configurable handler mappings, view resolution, locale, time zone and theme resolution as well as support for uploading files.
-
-###### DispatcherServlet
-
-The class is [DispatcherServlet](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/DispatcherServlet.html) central dispatcher for HTTP request handlers/controllers, e.g. for web UI controllers or HTTP-based remote service exporters. Dispatches to registered handlers for processing a web request, providing convenient mapping and exception handling facilities.
-
-###### ServletContainerInitializer & WebApplicationInitializer
-
-Servlet 3.0 [ServletContainerInitializer](http://docs.oracle.com/javaee/7/api/javax/servlet/ServletContainerInitializer.html?is-external=true) designed to support code-based configuration of the servlet container using Spring's WebApplicationInitializer SPI as opposed to (or possibly in combination with) the traditional web.xml-based approach.
-
-*ServletContainerInitializer* Interface which allows a library/runtime to be notified of a web application's startup phase and perform any required programmatic registration of servlets, filters, and listeners in response to it. In Spring, the class [SpringServletContainerInitializer](http://docs.spring.io/autorepo/docs/spring-framework/current/javadoc-api/org/springframework/web/SpringServletContainerInitializer.html#onStartup-java.util.Set-javax.servlet.ServletContext-) implements this interface. In Spring Boot, the class *TomcatStarter* (org.springframework.boot.context.embedded.tomcat.TomcatStarter) also implements this interface.
-
-*WebApplicationInitializer* Interface to be implemented in Servlet 3.0+ environments in order to configure the ServletContext programmatically -- as opposed to (or possibly in conjunction with) the traditional web.xml-based approach. Implementations of this SPI will be detected automatically by *SpringServletContainerInitializer*, which itself is bootstrapped automatically by any Servlet 3.0 container.
-
-Spring's [WebApplicationInitializer](http://docs.spring.io/autorepo/docs/spring-framework/current/javadoc-api/org/springframework/web/WebApplicationInitializer.html) SPI consists of just one method: WebApplicationInitializer.onStartup(ServletContext). The signature is intentionally quite similar to ServletContainerInitializer.onStartup(Set, ServletContext): simply put, SpringServletContainerInitializer is responsible for instantiating and delegating the ServletContext to any user-defined WebApplicationInitializer implementations. It is then the responsibility of each WebApplicationInitializer to do the actual work of initializing the ServletContext. 
-
-**The class SpringServletContainerInitializer is neither designed for extension nor intended to be extended. It should be considered an internal type, with WebApplicationInitializer being the public-facing SPI.**
-
-The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring-boot/current/api/org/springframework/boot/context/embedded/ServletContextInitializer.html) Interface used to configure a Servlet 3.0+ context programmatically. Unlike WebApplicationInitializer, classes that implement this interface (and do not implement WebApplicationInitializer) will not be detected by SpringServletContainerInitializer and hence will not be automatically bootstrapped by the Servlet container. This interface is primarily designed to allow ServletContextInitializers to be managed by Spring and not the Servlet container.
-
-**When you make your Spring Boot application as an executable jar with an embedded Tomcat 7, the WebApplicationInitialier is NOT called when the application is started. Instead, you need to create a bean which implements the [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring-boot/current/api/org/springframework/boot/context/embedded/ServletContextInitializer.html) interface.** See:
-
-* <https://github.com/spring-projects/spring-boot/issues/522>
-* <https://github.com/spring-projects/spring-boot/issues/321>
-* <http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-embedded-container-servlets-and-filters>
-
-###### Handling Exceptions
-
-##### View Technologies
-
-##### WebSocket Support
 
 
 ### Netty
@@ -494,8 +306,207 @@ The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring
 * OkHttp <http://square.github.io/okhttp/>
 
 
+## Frameworks - Spring
 
-## 3. Middlewares
+<http://spring.io>
+
+
+### Core Technologies
+
+#### The IoC Container
+
+IoC is also known as dependency injection (DI). It is a process whereby objects define their dependencies, that is, the other objects they work with, only through constructor arguments, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean. This process is fundamentally the inverse, hence the name Inversion of Control (IoC), of the bean itself controlling the instantiation or location of its dependencies by using direct construction of classes.
+The org.springframework.beans and org.springframework.context packages are the basis for Spring Framework’s IoC container.
+In Spring, the objects that form the backbone of your application and that are managed by the Spring IoC container are called *beans*. A bean is an object that is instantiated, assembled, and otherwise managed by a Spring IoC container. Otherwise, a bean is simply one of many objects in your application. Beans, and the dependencies among them, are reflected in the configuration metadata used by a container.The interface org.springframework.context.ApplicationContext represents the Spring *IoC container* and is responsible for instantiating, configuring, and assembling the aforementioned beans. The container gets its instructions on what objects to instantiate, configure, and assemble by reading *configuration metadata*. The configuration metadata is represented in *XML, Java annotations, or Java code*. It allows you to express the objects that compose your application and the rich interdependencies between such objects.The following diagram is a high-level view of how Spring works. Your application classes are combined with configuration metadata so that after the ApplicationContext is created and initialized, you have a fully configured and executable system or application.
+![IoC](https://github.com/rkq/docs/blob/master/pics/java_platform_spring_ioc.png)
+
+Configuration metadata could be:
+
+* XML-based configuration
+* Annotation-based configuration
+* Java-based configuration
+* Convention-based configuration
+
+**Classpath Scanning**
+
+##### Environment Abstraction
+The [Environment](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/core/env/Environment.html) is an abstraction integrated in the container that models two key aspects of the application environment: *profiles* and *properties*.A *profile* is a named, logical group of bean definitions to be registered with the container only if the given profile is active. Beans may be assigned to a profile whether defined in XML or via annotations. The role of the Environment object with relation to profiles is in determining which profiles (if any) are currently active, and which profiles (if any) should be active by default.
+*Properties* play an important role in almost all applications, and may originate from a variety of sources: properties files, JVM system properties, system environment variables, JNDI, servlet context parameters, ad-hoc Properties objects, Maps, and so on. The role of the Environment object with relation to properties is to provide the user with a convenient service interface for configuring property sources and resolving properties from them.
+**Bean Definition Profiles**Bean definition profiles is a mechanism in the core container that allows for registration of different beans in different environments. The word environment can mean different things to different users and this feature can help with many use cases, including:
+* working against an in-memory data source ind evelopment v.s. looking up that same data source from JNDI when in QA or production
+* registering monitoring infrastructure only when deploying an application into a performance environment
+* registering customized implementations of beans for customer A v.s.customer B deployments
+
+The @Profile annotation allows you to indicate that a component is eligible for registration when one or more specified profiles are active.
+
+*If a @Configuration class is marked with @Profile, all of the @Bean methods and @Import annotations associated with that class will be bypassed unless one or more of the specified profiles are active.*
+
+Activating a profile can be done in several ways, but the most straightforward is to do it programmatically against the Environment API which is available via an ApplicationContext.
+
+In addition, profiles may also be activated declaratively through the *spring.profiles.active* property which may be specified through system environment variables, JVM system properties, servlet context parameters in web.xml, or even as an entry in JNDI (see the section called “PropertySource abstraction”). In integration tests, active profiles can be declared via the @ActiveProfiles annotation in the spring-test module (see the section called “Context configuration with environment profiles”).
+
+Note that profiles are not an "either-or" proposition; it is possible to activate multiple profiles at once.
+*The default profile represents the profile that is enabled by default. If no profile is active, the dataSource above will be created; this can be seen as a way to provide a default definition for one or more beans. If any profile is enabled, the default profile will not apply.* The name of the default profile can be changed using setDefaultProfiles() on the Environment or declaratively using the spring.profiles.default property.**PropertySource Abstraction**Spring’s Environment abstraction provides search operations over a configurable hierarchy of property sources.
+A PropertySource is a simple abstraction over any source of key-value pairs, and Spring’s StandardEnvironment is configured with two PropertySource objects — one representing the set of JVM system properties (a la System.getProperties()) and one representing the set of system environment variables (a la System.getenv()).
+The Environment object perform sasearch over a set of PropertySource objects. The search performed is hierarchical. By default, system properties have precedence over environment variables.
+Most importantly, the entire mechanism is configurable. Perhaps you have a custom source of properties that you’d like to integrate into this search. No problem — simply implement and instantiate your own PropertySource and add it to the set of PropertySources for the current Environment.
+The @PropertySource annotation provides a convenient and declarative mechanism for adding a PropertySource to Spring’s Environment. Any ${...} placeholders present in a @PropertySource resource location will be resolved against the set of property sources already registered against the environment.
+#### ResourcesSpring’s *Resource* interface is meant to be a more capable interface for abstracting access to low- level resources. There are a number of Resource implementations that come supplied straight out of the box in Spring:
+* UrlResource
+* ClassPathResource
+* FileSystemResource
+* ServletContextResource
+* InputStreamResource
+* ByteArrayResource
+
+The *ResourceLoader* interface is meant to be implemented by objects that can return (i.e. load) Resource instances. All application contexts implement the ResourceLoader interface, and therefore all application contexts may be used to obtain Resource instances. When you call getResource() on a specific application context, and the location path specified doesn’t have a specific prefix, you will get back a Resource type that is appropriate to that particular application context. You can force specific type of Resource, regardless of the application context type, by specifying special prefix:
+
+|Prefix|Example|Explanation|
+|------|-------|-----------|
+|classpath:|classpath:com/myapp/config.xml|Loaded from the classpath.|
+|file:|file:///data/config.xml|Loaded as a URL, from the filesystem.|
+|http:|http://myserver/log.png|Loaded as a URL.|
+|(none)|/data/config.xml|Depends on the underlying ApplicationContext.|
+
+The *ResourceLoaderAware* interface is a special marker interface, identifying objects that expect to be provided with a ResourceLoader reference. When a class implements ResourceLoaderAware and is deployed into an application context (as a Spring-managed bean), it is recognized as ResourceLoaderAware by the application context. The application context will then invoke the setResourceLoader(ResourceLoader), supplying itself as the argument (remember, all application contexts in Spring implement the ResourceLoader interface). Of course, since an ApplicationContext is a ResourceLoader, the bean could also implement the ApplicationContextAware interface and use the supplied application context directly to load resources, but in general, it’s better to use the specialized ResourceLoader interface if that’s all that’s needed. The code would just be coupled to the resource loading interface, which can be considered a utility interface, and not the whole Spring ApplicationContext interface.
+
+As of Spring 2.5, you can rely upon autowiring of the ResourceLoader as an alternative to implementing the ResourceLoaderAware interface. The "traditional" constructor and byType autowiring modes (as described in the section called “Autowiring collaborators”) are now capable of providing a dependency of type ResourceLoader for either a constructor argument or setter method parameter respectively. For more flexibility (including the ability to autowire fields and multiple parameter methods), consider using the new annotation-based autowiring features. In that case, the ResourceLoader will be autowired into a field, constructor argument, or method parameter that is expecting the ResourceLoader type as long as the field, constructor, or method in question carries the @Autowired annotation.
+
+If the bean itself is going to determine and supply the resource path through some sort of dynamic process, it probably makes sense for the bean to use the ResourceLoader interface to load resources. Consider as an example the loading of a template of some sort, where the specific resource that is needed depends on the role of the user. If the resources are static, it makes sense to eliminate the use of the ResourceLoader interface completely, and just have the bean expose the Resource properties it needs, and expect that they will be injected into it. For example:
+
+```
+@Value("classpath:templates/home.html")
+private Resource template;
+```
+
+**FileSystemResource Caveats**
+
+A FileSystemResource that is not attached to a FileSystemApplicationContext (that is, a FileSystemApplicationContext is not the actual ResourceLoader) will treat absolute vs. relative paths as you would expect. Relative paths are relative to the current working directory, while absolute paths are relative to the root of the filesystem.
+
+For backwards compatibility (historical) reasons however, this changes when the FileSystemApplicationContext is the ResourceLoader. The FileSystemApplicationContext simply forces all attached FileSystemResource instances to treat all location paths as relative, whether they start with a leading slash or not.
+
+*In practice, if true absolute filesystem paths are needed, it is better to forgo the use of absolute paths with FileSystemResource / FileSystemXmlApplicationContext, and just force the use of a UrlResource, by using the file: URL prefix.*
+
+
+#### Validation, Data Binding, and Type Conversion
+
+There are pros and cons for considering validation as business logic, and Spring offers a design for validation (and data binding) that does not exclude either one of them. Specifically validation should not be tied to the web tier, should be easy to localize and it should be possible to plug in any validator available. Considering the above, Spring has come up with a Validator interface that is both basic and eminently usable in every layer of an application.
+Data binding is useful for allowing user input to be dynamically bound to the domain model of an application (or whatever objects you use to process user input). Spring provides the so-called DataBinder to do exactly that. The Validator and the DataBinder make up the validation package, which is primarily used in but not limited to the MVC framework.
+
+
+#### Spring Expression Language
+
+The Spring Expression Language (SpEL for short) is a powerful expression language that supports *querying and manipulating an object graph at runtime*. The expression language supports the following functionality:
+
+* Literal expressions
+* Boolean and relational operators
+* Regular expressions
+* Class expressions
+* Accessing properties, arrays, lists, maps
+* Method invocation
+* Relational operators
+* Assignment
+* Calling constructors
+* Bean references
+* Array construction
+* Inlineclists
+* Inline maps
+* Ternary operator
+* Variables
+* User defined functions
+* Collection projection
+* Collection selection
+* Templated expressions
+
+The more common usage of SpEL is to provide an expression string that is evaluated against a specific object instance (called the root object).
+
+**SpEL expressions can be used with XML or annotation-based configuration metadata for defining BeanDefinitions. In both cases the syntax to define the expression is of the form #{\<expression string\>}.**
+The variable systemProperties is predefined, so you can use it in your expressions. Note that you do not have to prefix the predefined variable with the # symbol in this context.
+
+#### AOP
+
+Aspect-Oriented Programming (AOP) complements Object-Oriented Programming (OOP) by providing another way of thinking about program structure. The key unit of modularity in OOP is the *class*, whereas in AOP the unit of modularity is the *aspect*. Aspects enable the modularization of concerns such as transaction management that cut across multiple types and objects. (Such concerns are often termed *cross-cutting concerns* in AOP literature.)
+
+Some central AOP concepts and terminology:
+
+* Aspect: a modularization of a concern that cuts across multiple classes. Transaction management is a good example of a crosscutting concern in enterprise Java applications. In Spring AOP, aspects are implemented using regular classes (the schema-based approach) or regular classes annotated with the @Aspect annotation (the @AspectJ style).
+* Join point: a point during the execution of a program, such as the execution of a method or the handling of an exception. In Spring AOP, a join point always represents a method execution.
+* Advice: action taken by an aspect at a particular join point. Different types of advice include "around," "before" and "after" advice. (Advice types are discussed below.) Many AOP frameworks, including Spring, model an advice as an interceptor, maintaining a chain of interceptors around the join point.
+* Pointcut: a predicate that matches join points. Advice is associated with a pointcut expression and runs at any join point matched by the pointcut (for example, the execution of a method with a certain name). The concept of join points as matched by pointcut expressions is central to AOP, and Spring uses the AspectJ pointcut expression language by default.
+* Introduction: declaring additional methods or fields on behalf of a type. Spring AOP allows you to introduce new interfaces (and a corresponding implementation) to any advised object. For example, you could use an introduction to make a bean implement an IsModified interface, to simplify caching. (An introduction is known as an inter-type declaration in the AspectJ community.)
+* Target object: object being advised by one or more aspects. Also referred to as the advised object. Since Spring AOP is implemented using runtime proxies, this object will always be a proxied object.
+* AOP proxy: an object created by the AOP framework in order to implement the aspect contracts (advise method executions and so on). In the Spring Framework, an AOP proxy will be a JDK dynamic proxy or a CGLIB proxy.
+* Weaving: linking aspects with other application types or objects to create an advised object. This can be done at compile time (using the AspectJ compiler, for example), load time, or at runtime. Spring AOP, like other pure Java AOP frameworks, performs weaving at runtime.
+
+Types of advice:
+
+* Before advice: Advice that executes before a join point, but which does not have the ability to prevent execution flow proceeding to the join point (unless it throws an exception).
+* After returning advice: Advice to be executed after a join point completes normally: for example, if a method returns without throwing an exception.
+* After throwing advice: Advice to be executed if a method exits by throwing an exception.
+* After (finally) advice: Advice to be executed regardless of the means by which a join point exits (normal or exceptional return).
+* Around advice: Advice that surrounds a join point such as a method invocation. This is the most powerful kind of advice. Around advice can perform custom behavior before and after the method invocation. It is also responsible for choosing whether to proceed to the join point or to shortcut the advised method execution by returning its own return value or throwing an exception.
+
+*Around advice is the most general kind of advice. Since Spring AOP, like AspectJ, provides a full range of advice types, we recommend that you use the least powerful advice type that can implement the required behavior.* For example, if you need only to update a cache with the return value of a method, you are better off implementing an after returning advice than an around advice, although an around advice can accomplish the same thing. Using the most specific advice type provides a simpler programming model with less potential for errors. For example, you do not need to invoke the proceed() method on the JoinPoint used for around advice, and hence cannot fail to invoke it.
+
+Aspect-oriented programming aims to encapsulate *cross-cutting concerns* into aspects to retain modularity. This allows for the clean isolation and reuse of code addressing the cross-cutting concern.
+
+*In aspect-oriented programming, cross-cutting concerns are aspects of a program that affect other concerns. These concerns often cannot be cleanly decomposed from the rest of the system in both the design and implementation, and can result in either scattering (code duplication), tangling (significant dependencies between systems), or both.*
+
+**Spring AOP is proxy-based.** It is vitally important that you grasp the semantics of what that last statement actually means before you write your own aspects or use any of the Spring AOP-based aspects supplied with the Spring Framework. Spring AOP defaults to using standard *JDK dynamic proxies* for AOP proxies. This enables any interface (or set of interfaces) to be proxied. Spring AOP can also use *CGLIB proxies*. This is necessary to proxy classes rather than interfaces. CGLIB is used by default if a business object does not implement an interface. As it is good practice to program to interfaces rather than classes; business classes normally will implement one or more business interfaces.
+
+*Spring AOP currently supports only method execution join points (advising the execution of methods on Spring beans)*. Field interception is not implemented, although support for field interception could be added without breaking the core Spring AOP APIs. If you need to advise field access and update join points, consider a language such as AspectJ.
+
+##### Interceptors, Filters, and AOP
+
+*HandlerInterceptor* is basically similar to a *Servlet Filter*, but in contrast to the latter it just allows custom pre-processing with the option of prohibiting the execution of the handler itself, and custom post-processing. Filters are more powerful, for example they allow for exchanging the request and response objects that are handed down the chain. Note that a filter is a servlet component, while a interceptor is a Spring component.
+
+As a basic guideline, fine-grained handler-related preprocessing tasks are candidates for HandlerInterceptor implementations, especially factored-out common handler code and authorization checks. On the other hand, a Filter is well-suited for request content and view content handling, like multipart forms and GZIP compression. This typically shows when one needs to map the filter to certain content types (e.g. images), or to all requests.
+
+### Data Access
+
+### The Web
+
+#### Web MVC Framework
+
+The Spring Web model-view-controller (MVC) framework is designed around a DispatcherServlet that dispatches requests to handlers, with configurable handler mappings, view resolution, locale, time zone and theme resolution as well as support for uploading files.
+
+##### DispatcherServlet
+
+The class is [DispatcherServlet](http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/web/servlet/DispatcherServlet.html) central dispatcher for HTTP request handlers/controllers, e.g. for web UI controllers or HTTP-based remote service exporters. Dispatches to registered handlers for processing a web request, providing convenient mapping and exception handling facilities.
+
+##### ServletContainerInitializer & WebApplicationInitializer
+
+Servlet 3.0 [ServletContainerInitializer](http://docs.oracle.com/javaee/7/api/javax/servlet/ServletContainerInitializer.html?is-external=true) designed to support code-based configuration of the servlet container using Spring's WebApplicationInitializer SPI as opposed to (or possibly in combination with) the traditional web.xml-based approach.
+
+*ServletContainerInitializer* Interface which allows a library/runtime to be notified of a web application's startup phase and perform any required programmatic registration of servlets, filters, and listeners in response to it. In Spring, the class [SpringServletContainerInitializer](http://docs.spring.io/autorepo/docs/spring-framework/current/javadoc-api/org/springframework/web/SpringServletContainerInitializer.html#onStartup-java.util.Set-javax.servlet.ServletContext-) implements this interface. In Spring Boot, the class *TomcatStarter* (org.springframework.boot.context.embedded.tomcat.TomcatStarter) also implements this interface.
+
+*WebApplicationInitializer* Interface to be implemented in Servlet 3.0+ environments in order to configure the ServletContext programmatically -- as opposed to (or possibly in conjunction with) the traditional web.xml-based approach. Implementations of this SPI will be detected automatically by *SpringServletContainerInitializer*, which itself is bootstrapped automatically by any Servlet 3.0 container.
+
+Spring's [WebApplicationInitializer](http://docs.spring.io/autorepo/docs/spring-framework/current/javadoc-api/org/springframework/web/WebApplicationInitializer.html) SPI consists of just one method: WebApplicationInitializer.onStartup(ServletContext). The signature is intentionally quite similar to ServletContainerInitializer.onStartup(Set, ServletContext): simply put, SpringServletContainerInitializer is responsible for instantiating and delegating the ServletContext to any user-defined WebApplicationInitializer implementations. It is then the responsibility of each WebApplicationInitializer to do the actual work of initializing the ServletContext. 
+
+**The class SpringServletContainerInitializer is neither designed for extension nor intended to be extended. It should be considered an internal type, with WebApplicationInitializer being the public-facing SPI.**
+
+The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring-boot/current/api/org/springframework/boot/context/embedded/ServletContextInitializer.html) Interface used to configure a Servlet 3.0+ context programmatically. Unlike WebApplicationInitializer, classes that implement this interface (and do not implement WebApplicationInitializer) will not be detected by SpringServletContainerInitializer and hence will not be automatically bootstrapped by the Servlet container. This interface is primarily designed to allow ServletContextInitializers to be managed by Spring and not the Servlet container.
+
+**When you make your Spring Boot application as an executable jar with an embedded Tomcat 7, the WebApplicationInitialier is NOT called when the application is started. Instead, you need to create a bean which implements the [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring-boot/current/api/org/springframework/boot/context/embedded/ServletContextInitializer.html) interface.** See:
+
+* <https://github.com/spring-projects/spring-boot/issues/522>
+* <https://github.com/spring-projects/spring-boot/issues/321>
+* <http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-embedded-container-servlets-and-filters>
+
+##### Handling Exceptions
+
+#### View Technologies
+
+#### WebSocket Support
+
+### Spring Boot
+
+### Spring Security
+
+Security is an ever-moving target, and it’s important to pursue a comprehensive, system-wide approach. In security circles we encourage you to adopt "layers of security", so that each layer tries to be as secure as possible in its own right, with successive layers providing additional security. The "tighter" the security of each layer, the more robust and safe your application will be. At the bottom level you’ll need to deal with issues such as transport security and system identification, in order to mitigate man-in-the-middle attacks. Next you’ll generally utilise firewalls, perhaps with VPNs or IP security to ensure only authorised systems can attempt to connect. In corporate environments you may deploy a DMZ to separate public-facing servers from backend database and application servers. Your operating system will also play a critical part, addressing issues such as running processes as non-privileged users and maximising file system security. An operating system will usually also be configured with its own firewall. Hopefully somewhere along the way you’ll be trying to prevent denial of service and brute force attacks against the system. An intrusion detection system will also be especially useful for monitoring and responding to attacks, with such systems able to take protective action such as blocking offending TCP/IP addresses in real-time. Moving to the higher layers, your Java Virtual Machine will hopefully be configured to minimize the permissions granted to different Java types, and then your application will add its own problem domain-specific security configuration. Spring Security makes this latter area - application security - much easier.
+
+## Middlewares
 
 ### Tomcat
 
@@ -505,7 +516,7 @@ The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring
 
 <http://www.eclipse.org/jetty/>
 
-## 4. Toolset
+## Toolset
 ### Continuous Delivery
 #### Maven
 
@@ -522,7 +533,7 @@ The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring
 <https://www.jetbrains.com/teamcity/>
 
 
-## 5. Java HotSpot Virtual Machine
+## Java HotSpot Virtual Machine
 
 ### Java Development Kit
 
