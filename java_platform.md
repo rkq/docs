@@ -504,6 +504,32 @@ Security is an ever-moving target, and it’s important to pursue a comprehensiv
 
 As you probably know two major areas of application security are *"authentication"* and *"authorization" (or "access-control")*. These are the two main areas that Spring Security targets. "Authentication" is the process of establishing a principal is who they claim to be (a "principal" generally means a user, device or some other system which can perform an action in your application)."Authorization" refers to the process of deciding whether a principal is allowed to perform an action within your application. To arrive at the point where an authorization decision is needed, the identity of the principal has already been established by the authentication process. These concepts are common, and not at all specific to Spring Security.
 
+Core components:
+
+* SecurityContextHolder, to provide access to the SecurityContext.
+* SecurityContext, to hold the Authentication and possibly request-specific security information.
+* Authentication, to represent the principal in a Spring Security-specific manner.
+* GrantedAuthority, to reflect the application-wide permissions granted to a principal.
+* UserDetails, to provide the necessary information to build an Authentication object from your application’s DAOs or other source of security data.
+* UserDetailsService, to create a UserDetails when passed in a String-based username (or certificate ID or the like).
+
+Core services:
+
+* AuthenticationManager and ProviderManager
+* AuthenticationProvider
+
+The AuthenticationManager is just an interface, so the implementation can be anything we choose. The default implementation in Spring Security is called ProviderManager and rather than handling the authentication request itself, it delegates to a list of configured AuthenticationProvider s, each of which is queried in turn to see if it can perform the authentication. Each provider will either throw an exception or return a fully populated Authentication object. The most common approach to verifying an authentication request is to load the corresponding UserDetails and check the loaded password against the one that has been entered by the user. This is the approach used by the DaoAuthenticationProvider. The loaded UserDetails object - and particularly the GrantedAuthority s it contains - will be used when building the fully populated Authentication object which is returned from a successful authentication and stored in the SecurityContext.
+
+
+With above components and services, the authentication process will look like below  (using user name and passwordauthentication as an example):
+
+1. The username and password are obtained and combined into an instance of UsernamePasswordAuthenticationToken (an instance of the Authentication interface, which we saw earlier).
+2. The token is passed to an instance of AuthenticationManager for validation.
+3. The AuthenticationManager returns a fully populated Authentication instance on successful authentication.
+4. The security context is established by calling SecurityContextHolder.getContext().setAuthentication(…​), passing in the returned authentication object.
+
+
+
 
 ## Frameworks - Netty
 
