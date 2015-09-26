@@ -528,6 +528,64 @@ With above components and services, the authentication process will look like be
 3. The AuthenticationManager returns a fully populated Authentication instance on successful authentication.
 4. The security context is established by calling SecurityContextHolder.getContext().setAuthentication(…​), passing in the returned authentication object.
 
+#### Web Application Security
+
+##### The Security Filter Chain
+
+Spring Security’s web infrastructure is based entirely on standard servlet filters. It doesn’t use servlets or any other servlet-based frameworks (such as Spring MVC) internally, so it has no strong links to any particular web technology. It deals in HttpServletRequest s and HttpServletResponse s and doesn’t care whether the requests come from a browser, a web service client, an HttpInvoker or an AJAX application.
+
+Spring Security maintains a filter chain internally where each of the filters has a particular responsibility and filters are added or removed from the configuration depending on which services are required. **The ordering of the filters is important as there are dependencies between them.**
+
+In Spring Security, the filter classes are also Spring beans defined in the application context and thus able to take advantage of Spring’s rich dependency-injection facilities and lifecycle interfaces. Spring’s **DelegatingFilterProxy** provides the link between web.xml and the application context.
+
+```
+<filter>
+    <filter-name>filterChainProxy</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+</filter>
+
+<filter-mapping>
+    <filter-name>filterChainProxy</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+
+Notice that the filter is actually a DelegatingFilterProxy, and not the class that will actually implement the logic of the filter. What DelegatingFilterProxy does is delegate the Filter’s methods through to a bean which is obtained from the Spring application context. This enables the bean to benefit from the Spring web application context lifecycle support and configuration flexibility. The bean must implement javax.servlet.Filter and it must have the same name as that in the filter-name element.
+
+Spring Security’s web infrastructure should only be used by delegating to an instance of FilterChainProxy. The security filters should not be used by themselves. In theory you could declare each Spring Security filter bean that you require in your application context file and add a corresponding DelegatingFilterProxy entry to web.xml for each filter, making sure that they are ordered correctly, but this would be cumbersome and would clutter up the web.xml file quickly if you have a lot of filters. FilterChainProxy lets us add a single entry to web.xml and deal entirely with the application context file for managing our web security beans. It is wired using a DelegatingFilterProxy, just like in the example above, but with the filter-name set to the bean name "filterChainProxy". The filter chain is then declared in the application context with the same bean name. Here’s an example:
+
+```
+<bean id="filterChainProxy" class="org.springframework.security.web.FilterChainProxy">
+<constructor-arg>
+	<list>
+	<sec:filter-chain pattern="/restful/**" filters="
+		securityContextPersistenceFilterWithASCFalse,
+		basicAuthenticationFilter,
+		exceptionTranslationFilter,
+		filterSecurityInterceptor" />
+	<sec:filter-chain pattern="/**" filters="
+		securityContextPersistenceFilterWithASCTrue,
+		formLoginFilter,
+		exceptionTranslationFilter,
+		filterSecurityInterceptor" />
+	</list>
+</constructor-arg>
+</bean>
+```
+
+The order that filters are defined in the chain is very important. Irrespective of which filters you are actually using, the order should be as follows:
+
+* ChannelProcessingFilter, because it might need to redirect to a different protocol
+* SecurityContextPersistenceFilter, so a SecurityContext can be set up in the SecurityContextHolder at the beginning of a web request, and any changes to the SecurityContext can be copied to the HttpSession when the web request ends (ready for use with the next web request)
+* ConcurrentSessionFilter, because it uses the SecurityContextHolder functionality and needs to update the SessionRegistry to reflect ongoing requests from the principal
+* Authentication processing mechanisms - UsernamePasswordAuthenticationFilter, CasAuthenticationFilter, BasicAuthenticationFilter etc - so that the SecurityContextHolder can be modified to contain a valid Authentication request token
+* The SecurityContextHolderAwareRequestFilter, if you are using it to install a Spring Security aware HttpServletRequestWrapper into your servlet container
+* The JaasApiIntegrationFilter, if a JaasAuthenticationToken is in the SecurityContextHolder this will process the FilterChain as the Subject in the JaasAuthenticationToken
+* RememberMeAuthenticationFilter, so that if no earlier authentication processing mechanism updated the SecurityContextHolder, and the request presents a cookie that enables remember-me services to take place, a suitable remembered Authentication object will be put there
+* AnonymousAuthenticationFilter, so that if no earlier authentication processing mechanism updated the SecurityContextHolder, an anonymous Authentication object will be put there
+* ExceptionTranslationFilter, to catch any Spring Security exceptions so that either an HTTP error response can be returned or an appropriate AuthenticationEntryPoint can be launched
+* FilterSecurityInterceptor, to protect web URIs and raise exceptions when access is denied
+
 
 
 
