@@ -656,7 +656,7 @@ Netty provides a "local" transport for asynchronous communication between client
 
 ### EventLoop and Thread Model
 
-All of your ChannelHandlers, which contain your business logic, are guaranteed to be executed by the same Thread for a specific Channel. This doesnt mean Netty fails to use multithreading, but it does pin each Channel to one Thread.
+All of your ChannelHandlers, which contain your business logic, are guaranteed to be executed by the same Thread for a specific Channel. This doesn't mean Netty fails to use multithreading, but it does pin each Channel to one Thread.
 
 An EventLoop is powered by exactly one Thread that never changes. To make proper use of resources, Netty uses multiple EventLoops, depending on the configuration and the available cores.
 
