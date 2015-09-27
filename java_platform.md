@@ -678,7 +678,7 @@ The semantic is a bit different for other transports, such as the shipped OIO (O
 
 #### Scheduling Tasks for Later Execution
 
-You can schedule tasks for later execution in Netty using its powerful EventLoop implementation. The actual implementation in Netty is based on the paper Hashed and Hierarchical Timing Wheels: Data Structures for the Efficient Implementation of a Timer Facility, by George Varghese and Tony Lauck. This kind of implementation only guarantees an approximated execution, which means that the execution of the task may not be 100% on time. This has proven to be a tolerable limitation in practice and does not affect most applications at all. It's just something to remember if you need to schedule tasks, because it may not be the perfect fit if you need 100% on-time execution.
+You can schedule tasks for later execution in Netty using its powerful EventLoop implementation. The actual implementation in Netty is based on the paper Hashed and Hierarchical Timing Wheels: Data Structures for the Efficient Implementation of a Timer Facility, by George Varghese and Tony Lauck. This kind of implementation only guarantees an approximated execution, which means that the execution of the task may not be 100% on time. This has proven to be a tolerable limitation in practice and does not affect most applications at all. It's just something to remember if you need to schedule tasks, because it may not be the perfect fit if you need 100% on-time execution.
 
 To better understand how this works, think of it this way:
 
