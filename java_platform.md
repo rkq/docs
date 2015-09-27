@@ -627,7 +627,7 @@ NIO provides a fully asynchronous implementation of all I/O operations. At it's 
 The basic concept of the selector is to register to receive notification when the state of a Channel changes. The possible state changes are:* A new Channel was accepted and is ready.
 * A Channel connection was completed.* A Channel has data that is ready for reading.* A Channel is available for writing data.
 ![NIO](https://github.com/rkq/docs/blob/master/pics/java_platform_netty_nio.png)
-A feature that is currently available only with NIO transport is called zero-file-copy, which allows you to quickly and efficiently transfer content from a file system by moving data to the network stack without copying from kernel space to user space. This can make a big difference in protocols such as FTP or HTTP.
+A feature that is currently available only with NIO transport is called zero-file-copy, which allows you to quickly and efficiently transfer content from a file system by moving data to the network stack without copying from kernel space to user space. This can make a big difference in protocols such as FTP or HTTP.
 
 
 ### EventLoop and Thread Model
