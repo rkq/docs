@@ -618,6 +618,18 @@ Key components:
 * EventLoop, An EventLoop processes I/O operations for a Channel. A single EventLoop will typically handle events for multiple Channels. An EventLoopGroup may contain more than one EventLoop and provides an iterator for retrieving the next one in the list.
 * ChannelFuture, All I/O operations in Netty are asynchronous. Since an operation may not return immediately we need to have a way to determine its result at a later time. For this purpose Netty provides interface ChannelFuture, whose addListener method registers a ChannelFutureListener to be notified when an operation has completed (whether successfully or not).
 
+### Transports
+
+**NIO  Nonblocking I/O**
+
+NIO provides a fully asynchronous implementation of all I/O operations. At it's base is the selector approach that has been available in since the NIO subsystem was introduced in JDK 1.4.
+
+The basic concept of the selector is to register to receive notification when the state of a Channel changes. The possible state changes are:* A new Channel was accepted and is ready.
+* A Channel connection was completed.* A Channel has data that is ready for reading.* A Channel is available for writing data.
+![NIO](https://github/com/rkq/docs/pics/java_platform_netty_nio.png)
+A feature that is currently available only with NIO transport is called zero-file-copy, which allows you to quickly and efficiently transfer content from a file system by moving data to the network stack without copying from kernel space to user space. This can make a big difference in protocols such as FTP or HTTP.
+
+
 ### EventLoop and Thread Model
 
 All of your ChannelHandlers, which contain your business logic, are guaranteed to be executed by the same Thread for a specific Channel. This doesnt mean Netty fails to use multithreading, but it does pin each Channel to one Thread.
@@ -649,7 +661,9 @@ To better understand how this works, think of it this way:
 1. You schedule a task with a given delay.2. The task gets inserted into the Schedule-Task-Queue of the EventLoop.3. The EventLoop checks on every run to see if tasks need to get executed then.
 4. If theres a task, the EventLoop will execute it right away and remove it from the queue.5. The EventLoop waits for the next run and starts over again with step 4.
 Because of this implementation, the scheduled execution may be not 100% accurate. This is fine for most use cases given that it allows for almost no overhead within Netty.But what if you need more accurate execution? Its easy. Youll need to use another implementation of ScheduledExecutorService thats not part of Netty. Just remember that if you dont follow Nettys thread model protocol, youll need to synchronize the concurrent access on your own. Do this only if you must.
-### ChannelHandler and ChannelPipeline
+### ChannelHandler and ChannelPipeline
+**Blocking Operations**
+While the I/O thread must not be blocked at all, thus prohibiting any direct blocking operations within your ChannelHandler, there is a way to implement this requirement. You can specify an EventExecutorGroup when adding ChannelHandlers to the ChannelPipeline. This EventExecutorGroup will then be used to obtain an EventExecutor, which will execute all the methods of the ChannelHandler. This EventExecutor will use a different thread from the I/O thread, thus freeing up the EventLoop.
 ## Middlewares
 
 ### Tomcat
