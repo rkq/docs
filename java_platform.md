@@ -604,7 +604,10 @@ When we looked at how to set up web security using namespace configuration, we u
 
 ## Frameworks - Netty
 
-<http://netty.io>
+Netty is an *asynchronous event-driven* network application framework 
+for rapid development of maintainable high performance protocol servers & clients. See <http://netty.io>.
+
+![Netty Archetecture](https://github.com/rkq/docs/blob/master/pics/java_platform_netty_architecture.png)
 
 ## Middlewares
 
