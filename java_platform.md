@@ -620,6 +620,8 @@ Key components:
 
 ### Transports
 
+Netty comes bundled with a several transports that are ready for use. Not all of them support all protocols. This means the transport you select needs to be compatible with underlying protocol employed by your application.
+
 **NIO Nonblocking I/O**
 
 NIO provides a fully asynchronous implementation of all I/O operations. At it's base is the selector approach that has been available in since the NIO subsystem was introduced in JDK 1.4.
@@ -629,6 +631,28 @@ The basic concept of the selector is to register to receive notification when th
 ![NIO](https://github.com/rkq/docs/blob/master/pics/java_platform_netty_nio.png)
 A feature that is currently available only with NIO transport is called zero-file-copy, which allows you to quickly and efficiently transfer content from a file system by moving data to the network stack without copying from kernel space to user space. This can make a big difference in protocols such as FTP or HTTP.
 
+**OIO Old Blocking I/O**
+
+In Netty, the OIO transport represents a compromise. It is accessed via Netty's common API but is not asynchronous, being built on the blocking implementation of java.net.
+
+In the java.net API you usually have one thread that accepts new connections arriving at the listening ServerSocket and creating a new thread to handle the traffic on the new Socket. This is required since every I/O operation on a specific socket may block at any time. Handling multiple sockets with a single thread could easily lead to a blocking operation on one socket tying up all the others as well.Given this, you may wonder how Netty can support NIO with the same API used for asynchronous transports. Here Netty makes use of the SO_TIMEOUT flag that can be set on a Socket. This timeout specifies the maximum number of milliseconds to wait for an I/O operation to complete. If the operation fails to complete within the specified interval, a SocketTimeoutException is thrown. Netty catches this exception and continues the processing loop. On the next EventLoop run, it tries again. This is in fact the only way an asynchronous framework like Netty can support OIO. The problem with this approach is the cost of filling in the stack trace when a SocketTimeoutException is thrown.
+
+![OIO](https://github.com/rkq/docs/blob/master/pics/java_platform_netty_oio.png)
+
+**Local Transport for Communication within a JVM**
+
+Netty provides a "local" transport for asynchronous communication between clients and servers running in the same Java Virtual Machine. This transport supports the API common to all Netty transport implementations.
+In this transport the SocketAddress associated with a server Channel is not "bound" to a physical network address, rather it is stored in a registry for as long as the server is running and deregistered when the Channel is closed. Since the transport does not accept "real" network traffic, it can't interoperate with other transport implementations. Therefore, a client that wishes to connect to a server that uses local transport must use it as well. Apart from this limitation, its use is identical to that of other transports.
+**Embedded Transport**
+Netty also provides a transport that allows you to embed ChannelHandler instances in other ChannelHandlers and use them like helper classes, adding flexibility to the ways in which you can interact with your ChannelHandlers.
+This embedding technique is typically used for testing ChannelHandler implementations, but it can also be employed to add functionality to an existing ChannelHandler without requiring code changes. The key to the embedded transport is a concrete Channel implementation not surprisingly called "EmbeddedChannel".
+#### Transport Use Cases
+![Transport-Protocol](https://github.com/rkq/docs/blob/master/pics/java_platform_netty_transport_protocol.png)
+**NON-BLOCKING CODE-BASE**
+If you dont have blocking calls in your code base - or can limit them - it is always a good idea to use NIO. While NIO is intended to handle many concurrent connections it also works out quite well with a smaller number, especially given the way it shares threads across connections.**BLOCKING CODE BASE**
+If your code base relies heavily on blocking I/O and your applications have a corresponding design, you are likely to encounter problems with blocking operations if you try to convert directly to Netty's NIO transport. Rather than rewriting your code to accomplish this, consider a phased migration: start with with OIO and move to NIO once you have revised your code.**COMMUNICATIONS WITHIN THE SAME JVM**
+Communications within the same JVM with no need to expose a service over the network present the perfect use case for local transport. This will eliminate all the overhead of real network operations while still employing your Netty code base.If the need arises later to expose the service over the network you will need only to replace the transport with NIO or OIO. You may also find it useful to add an extra encoder and decoder to convert Java objects to and from ByteBuf.**TESTING YOUR CHANNELHANDLER IMPLEMENTATIONS**
+If you want to write unit tests for your ChannelHandler implementations, consider using the embedded transport. This will make it easy to test your code without having to create many mock objects. Your classes will still conform to the common API event flow, guaranteeing that the ChannelHandler will work correctly with "live" transports.
 
 ### EventLoop and Thread Model
 
