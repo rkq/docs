@@ -618,6 +618,38 @@ Key components:
 * EventLoop, An EventLoop processes I/O operations for a Channel. A single EventLoop will typically handle events for multiple Channels. An EventLoopGroup may contain more than one EventLoop and provides an iterator for retrieving the next one in the list.
 * ChannelFuture, All I/O operations in Netty are asynchronous. Since an operation may not return immediately we need to have a way to determine its result at a later time. For this purpose Netty provides interface ChannelFuture, whose addListener method registers a ChannelFutureListener to be notified when an operation has completed (whether successfully or not).
 
+### EventLoop and Thread Model
+
+All of your ChannelHandlers, which contain your business logic, are guaranteed to be executed by the same Thread for a specific Channel. This doesnt mean Netty fails to use multithreading, but it does pin each Channel to one Thread.
+
+An EventLoop is powered by exactly one Thread that never changes. To make proper use of resources, Netty uses multiple EventLoops, depending on the configuration and the available cores.
+
+One important thing about I/O and event handling in Netty 4 is that each of these I/O operations and events are always handled by the EventLoop itself and so by the Thread thats assigned to the EventLoop.
+
+The trick thats used inside Netty to make its thread model perform so well is that it checks to see if the executing Thread is the one thats assigned to the actual Channel (and EventLoop). The EventLoop is responsible for handling all events for a Channel during its lifetime. If the calling Thread is the same as the one of the EventLoop, the code block in question is executed. If the Thread is different, it schedules a task and puts it in an internal queue, used by the EventLoop, for later execution. The EventLoop will notice that theres a queued task to process and automatically pick it up. This allows you to directly interact with the Channel from any Thread while still being sure that all ChannelHandlers dont need to worry about concurrent access.
+
+Its important to know that each EventLoop has its own task/event queue and so is not affected by other EventLoops when processing the queue.
+
+**That said, because of the design its important to ensure that you never put any long-running tasks in the execution queue, because once the task is executed and run it will effectively block any other task from executing on the same thread.** How much this affects the overall system depends on the implementation of the EventLoop thats used in the specific transport implementation. Because switching between transports is possible without any changes in your code base, its important to remember that the Golden Rule always applies here: **Never block the I/O thread**. If you must block calls (or execute tasks that can take long periods to complete), you must use a dedicated EventExecutor for your ChannelHandler.
+
+Every once in a while, you need to schedule a task for later execution. Maybe you want to register a task that gets fired after a client is connected for five minutes. A common use case is to send an Are you alive? message to the remote peer to see if its still there. If it fails to respond, you know its not connected anymore, and you can close the channel (connection) and release the resources.
+
+Netty uses an EventLoopGroup that contains EventLoops that will serve the I/O and events for a Channel. *The way EventLoops are created and assigned varies based on the transport implementation.* An asynchronous implementation uses only a few EventLoops (and so Threads) that are shared between the Channels. This allows a minimal number of Threads to serve many Channels, eliminating the need to have one dedicated Thread for each of them.
+
+![Netty Eventloop](https://github.com/rkq/docs/blob/master/pics/java_platform_netty_eventloop.png)
+
+The semantic is a bit different for other transports, such as the shipped OIO (Old Blocking I/O) transport: one EventLoop (and so one Thread) is created per Channel. But even if the semantics change in this case, one thing still stays the same: Each Channels I/O will be handled by only one Thread at one time, which is the one Thread that powers the EventLoop of the Channel. You can depend on this hard rule; its what makes writing code via the Netty framework so easy compared to other user network frameworks out there.
+
+#### Scheduling Tasks for Later Execution
+
+You can schedule tasks for later execution in Netty using its powerful EventLoop implementation. The actual implementation in Netty is based on the paper Hashed and Hierarchical Timing Wheels: Data Structures for the Efficient Implementation of a Timer Facility, by George Varghese and Tony Lauck. This kind of implementation only guarantees an approximated execution, which means that the execution of the task may not be 100% on time. This has proven to be a tolerable limitation in practice and does not affect most applications at all. Its just something to remember if you need to schedule tasks, because it may not be the perfect fit if you need 100% on-time execution.
+
+To better understand how this works, think of it this way:
+
+1. You schedule a task with a given delay.2. The task gets inserted into the Schedule-Task-Queue of the EventLoop.3. The EventLoop checks on every run to see if tasks need to get executed then.
+4. If theres a task, the EventLoop will execute it right away and remove it from the queue.5. The EventLoop waits for the next run and starts over again with step 4.
+Because of this implementation, the scheduled execution may be not 100% accurate. This is fine for most use cases given that it allows for almost no overhead within Netty.But what if you need more accurate execution? Its easy. Youll need to use another implementation of ScheduledExecutorService thats not part of Netty. Just remember that if you dont follow Nettys thread model protocol, youll need to synchronize the concurrent access on your own. Do this only if you must.
+### ChannelHandler and ChannelPipeline
 ## Middlewares
 
 ### Tomcat
