@@ -496,6 +496,14 @@ The class [ServletContextInitializer](http://docs.spring.io/autorepo/docs/spring
 
 #### WebSocket Support
 
+### Spring IO Platform
+
+The Spring IO platform includes Foundation Layer modules and Execution Layer domain-specific runtimes (DSRs). The Foundation layer represents the core Spring modules and associated third-party dependencies that have been harmonized to ensure a smooth development experience. The DSRs provided by the Spring IO Execution Layer dramatically simplify building production-ready, JVM-based workloads. See <http://spring.io/platform>.
+
+![Spring IO Platform]<https://github.com/rkq/docs/blob/master/pics/java_platform_spring_io_architecture.png>
+
+
+
 ### Spring Boot
 
 ### Spring Security
