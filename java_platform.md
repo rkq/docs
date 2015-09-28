@@ -752,6 +752,21 @@ To better understand how this works, think of it this way:
 4. If there's a task, the EventLoop will execute it right away and remove it from the queue.5. The EventLoop waits for the next run and starts over again with step 4.
 Because of this implementation, the scheduled execution may be not 100% accurate. This is fine for most use cases given that it allows for almost no overhead within Netty.But what if you need more accurate execution? It's easy. You'll need to use another implementation of ScheduledExecutorService that's not part of Netty. Just remember that if you don't follow Netty's thread model protocol, you'll need to synchronize the concurrent access on your own. Do this only if you must.
 
+### Netty-based Frameworks
+
+#### Facebook Nifty and Swift
+
+<https://github.com/facebook/nifty>
+
+<https://github.com/facebook/swift>
+
+#### Twitter Finagle
+
+<https://github.com/twitter/finagle>
+
+#### Google gRPC
+
+<https://github.com/grpc/grpc-java>
 
 ## Middlewares
 
