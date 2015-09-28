@@ -653,6 +653,45 @@ Netty provides a "local" transport for asynchronous communication between client
 If your code base relies heavily on blocking I/O and your applications have a corresponding design, you are likely to encounter problems with blocking operations if you try to convert directly to Netty's NIO transport. Rather than rewriting your code to accomplish this, consider a phased migration: start with with OIO and move to NIO once you have revised your code.**COMMUNICATIONS WITHIN THE SAME JVM**
 Communications within the same JVM with no need to expose a service over the network present the perfect use case for local transport. This will eliminate all the overhead of real network operations while still employing your Netty code base.If the need arises later to expose the service over the network you will need only to replace the transport with NIO or OIO. You may also find it useful to add an extra encoder and decoder to convert Java objects to and from ByteBuf.**TESTING YOUR CHANNELHANDLER IMPLEMENTATIONS**
 If you want to write unit tests for your ChannelHandler implementations, consider using the embedded transport. This will make it easy to test your code without having to create many mock objects. Your classes will still conform to the common API event flow, guaranteeing that the ChannelHandler will work correctly with "live" transports.
+### Buffers
+Netty uses *reference-counting* to determine when to release a *ByteBuf* or *ByteBufHolder* and any associated resources, thereby enabling the use of pooling and other techniques to improve performance and reduce memory consumption.
+
+### ChannelHandler and ChannelPipeline
+Netty provides powerful support for the data-processing areas of application development. The ChannelHandlers can be chained together in a ChannelPipeline to structure processing steps in a flexible and modular fashion. It involves ChannelHandler, ChannelPipeline and an important related class, ChannelHandlerContext.
+Netty defines these two important subinterfaces of ChannelHandler:
+* ChannelInboundHandler - processes inbound data and state changes of all kinds.
+* ChannelOutboundHandler - processes outbound data and allows interception of allkinds of operations.
+Netty provides a simple skeleton implementation of ChannelHandler that has bodies for all of the declared method signatures. The methods of this class, *ChannelHandlerAdapter*, merely forward events to the next ChannelHandler in the pipeline until the end of the pipeline is reached. This class also serves as the base for *ChannelInboundHandlerAdapter* and *ChannelOutboundHandlerAdapter*.*All three adapter classes are intended to serve as starting points for your own implementations; you can extend them, overriding only the methods you need to customize.*
+#### ChannelInboundHandler
+**Please note that a ChannelInboundHandler implementation that overrides channelRead() to process incoming messages is responsible for releasing resources. Netty uses pooled resources for ByteBuf, so failing to release resources will lead to a memory leak.**
+Netty logs unreleased resources with a WARN-level log entry, making it fairly simple to find offending instances in the code. However, since managing resources by hand can be cumbersome, you can simplify matters by using SimpleChannelInboundHandler. Please note: since SimpleChannelInboundHandler releases resources automatically, do not store references to any messages for later use, as these will become invalid.
+#### ChannelOutboundHandler
+A powerful aspect of ChannelOutboundHandler's role is its ability to defer an operation or event on request. This enables some sophisticated approaches to request handling. For example, you can defer flush operations if writing to the remote peer is suspended and pick them up at a later time.
+**Blocking Operations**
+While the I/O thread must not be blocked at all, thus prohibiting any direct blocking operations within your ChannelHandler, there is a way to implement this requirement. You can specify an EventExecutorGroup when adding ChannelHandlers to the ChannelPipeline. This EventExecutorGroup will then be used to obtain an EventExecutor, which will execute all the methods of the ChannelHandler. This EventExecutor will use a different thread from the I/O thread, thus freeing up the EventLoop.
+### The Codec Framework
+Every network application has to define how raw bytes transferred between peers are to be parsed and converted to - and from - the target program's data format. This conversion logic will be handled by a "codec," which consists of a "decoder" and an "encoder".Both decoders and encoders transform one sequence of bytes to another. How do we distinguish them?Think of a "message" as a structured sequence of bytes having semantic meaning for a specific application - its "data". The encoder is the component that converts that message to a format suitable for transmission (most likely a byte stream), while the corresponding decoder transforms the transmitted data back to the program's message format. It is logical, then, to think of conversion "from" a message as operating on outbound data, while conversion "to" a message is handling inbound data.
+#### Decoders
+Netty has a rich set of abstract base classes that simplify the writing of decoders. These cover two distinct use cases:
+* decoding from bytes to message (ByteToMessageDecoder and ReplayingDecoder)
+* decoding from message to message (MessageToMessageDecoder)
+
+A Netty decoder is an abstract implementation of ChannelInboundHandler.
+
+
+#### Encoders
+
+An encoder trasforms outbound data from one format to another, thus it implements ChanneOutboundHandler. 
+
+Netty offers a set of classes to help you to write encoders. Not surprisingly, they address the reverse of the decoder functions:
+
+* encoding from message to bytes
+* encoding from message to message
+
+
+### Bootstrapping
+
+
 
 ### EventLoop and Thread Model
 
@@ -685,9 +724,8 @@ To better understand how this works, think of it this way:
 1. You schedule a task with a given delay.2. The task gets inserted into the Schedule-Task-Queue of the EventLoop.3. The EventLoop checks on every run to see if tasks need to get executed then.
 4. If there's a task, the EventLoop will execute it right away and remove it from the queue.5. The EventLoop waits for the next run and starts over again with step 4.
 Because of this implementation, the scheduled execution may be not 100% accurate. This is fine for most use cases given that it allows for almost no overhead within Netty.But what if you need more accurate execution? It's easy. You'll need to use another implementation of ScheduledExecutorService that's not part of Netty. Just remember that if you don't follow Netty's thread model protocol, you'll need to synchronize the concurrent access on your own. Do this only if you must.
-### ChannelHandler and ChannelPipeline
-**Blocking Operations**
-While the I/O thread must not be blocked at all, thus prohibiting any direct blocking operations within your ChannelHandler, there is a way to implement this requirement. You can specify an EventExecutorGroup when adding ChannelHandlers to the ChannelPipeline. This EventExecutorGroup will then be used to obtain an EventExecutor, which will execute all the methods of the ChannelHandler. This EventExecutor will use a different thread from the I/O thread, thus freeing up the EventLoop.
+
+
 ## Middlewares
 
 ### Tomcat
