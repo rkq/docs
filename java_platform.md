@@ -713,11 +713,16 @@ Netty offers a set of classes to help you to write encoders. Not surprisingly, t
 
 ### Bootstrapping
 
+In the simplest terms, bootstrapping is the process of configuring an application. Netty's classes for bootstrapping clients and servers insulate your application code from the network infrastructure, connecting and enabling all of the components in the background.
 
+Netty includes two different types of bootstraps. Rather than just thinking of them as "server" and "client" bootsraps, it is more useful to consider the application functions they are intended to support. In this sense, "servers" are applications that devote a "parent" channel to accepting connections and create "child" channels for them, while a "client" will most likely require only a single, non-"parent" channel for all network interactions.
 
 ### EventLoop and Thread Model
 
 All of your ChannelHandlers, which contain your business logic, are guaranteed to be executed by the same Thread for a specific Channel. This doesn't mean Netty fails to use multithreading, but it does pin each Channel to one Thread.
+
+**EventLoop and EventLoopGroup**
+Remember that the EventLoop assigned to the Channel is responsible for handling all the operations for the Channel. Whenever you execute a method that returns a ChannelFuture it will be executed in the EventLoop that is assigned to the Channel.The EventLoopGroup contains a number of EventLoops and assigns an EventLoop to the Channel when it is registered.
 
 An EventLoop is powered by exactly one Thread that never changes. To make proper use of resources, Netty uses multiple EventLoops, depending on the configuration and the available cores.
 
